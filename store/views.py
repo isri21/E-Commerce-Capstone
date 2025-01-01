@@ -6,7 +6,11 @@ from rest_framework import status
 from django.db.models import Q
 from .functions import CustomPagination
 from rest_framework.permissions import IsAuthenticated
+from account.models import *
+from django.db import IntegrityError
 
+
+# View for getting all the proucts in the store
 @api_view(["GET"])
 def list_product_view(request):
 	# instantiate the custom paginator
@@ -101,6 +105,7 @@ def list_product_view(request):
 	return paginator.get_paginated_response(serializer.data)
 
 
+# View for getting a products details
 @api_view(["GET", "POST"])
 def detail_product_view(request, id):
 	# LOGIC for POST method
@@ -143,3 +148,34 @@ def detail_product_view(request, id):
 	serializer = DetailProdcutSerializer(product)
 	return Response(serializer.data, status=status.HTTP_200_OK)
 
+# View for adding a product to a wishlist
+@api_view(["POST"])
+def wishlist_product(request, id):
+	permission = IsAuthenticated() # Instantiate an IsAuthenticated permisison
+	# Check if the user doesn't have the permisison, if not retrun an error
+	if not permission.has_permission(request, None):
+		return Response({
+			"error": "You must be authenticated in order to purchase a product, please send you authentication token in the request header."
+		}, status=status.HTTP_401_UNAUTHORIZED)
+	
+	# Get the user object
+	user = request.user
+
+	# Try to get the specific product, else return an error if it doesn't exist
+	try:
+		product = Product.objects.get(id=id)
+	except:
+		return Response({
+			"not_found": f"A product with an id [{id}] does not exist."
+		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Try to create the wishlist item, if integrity error is raised, return an error stating that.
+	try:
+		Wishlist.objects.create(user=user, product=product)
+		return Response({
+			"status": f"Product '{product.name}' added to wish list",
+		}, status=status.HTTP_201_CREATED)
+	except IntegrityError:
+		return Response({
+			"error": "You have already added this product to your wish list."
+		}, status=status.HTTP_409_CONFLICT)

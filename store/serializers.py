@@ -37,7 +37,7 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 # Serializer for detail view of specific products
 class DetailProdcutSerializer(serializers.ModelSerializer):
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
-	posted_at = serializers.DateField(source="created_at") # Change the name of the created_date field to posted_at
+	posted_at = serializers.DateTimeField(source="created_at") # Change the name of the created_date field to posted_at
 	images = ImageSerializer(many=True) 
 	category = CategorySerializer(many=True)
 	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
