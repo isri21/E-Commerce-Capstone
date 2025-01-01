@@ -1,5 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from rest_framework.permissions import BasePermission
 
 
 class CustomPagination(PageNumberPagination):
@@ -16,3 +17,5 @@ class CustomPagination(PageNumberPagination):
 			'previous_page': self.get_previous_link(),
 			'results': data
 		})
+
+

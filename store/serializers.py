@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import *
-
+from account.models import *
+from django.db import IntegrityError
+from rest_framework import status
 
 # Serializer for the Image model to be nested into the GeneralProductsSerializer
 class ImageSerializer(serializers.ModelSerializer):
@@ -37,7 +39,7 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 # Serializer for detail view of specific products
 class DetailProdcutSerializer(serializers.ModelSerializer):
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
-	posted_at = serializers.DateTimeField(source="created_at") # Change the name of the created_date field to posted_at
+	posted_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", source="created_at") # Change the name of the created_date field to posted_at
 	images = ImageSerializer(many=True) 
 	category = CategorySerializer(many=True)
 	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
@@ -107,3 +109,25 @@ class PurchaseSerializer(serializers.ModelSerializer):
 		purchase_price = float(data["purchase_price"]) # Set a purchase price variable with a float value of the purchase price
 		data["purchase_price"] = purchase_price # Convert the purchase price into a float type
 		return {"message": "Purchase Successful", "purchase_info": data} # Return custom strucutre
+
+# Serializer for the review model
+class ReviewSerializer(serializers.ModelSerializer):
+	# Display the actual name of the user, instead of it's id
+	user = serializers.CharField(source="user.username", read_only=True)
+	# Display the actual name of the product, instead of it's id
+	product = serializers.CharField(source="product.name", read_only=True)
+	class Meta:
+		model = Review
+		fields = ["user", "product", "review", "review_date", "edited_at"]
+		# Specify read only fields
+		read_only_fields = ["review_date", "edited_at"]
+
+	# Create custom create method
+	def create(self, validated_data):
+		# Try to create the review, if integrity error is raised, return an error stating that.
+		try:
+			return Review.objects.create(**validated_data)
+		except IntegrityError:
+			res = serializers.ValidationError({"error": "You have already reviewed this product."})
+			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
+			raise res # raise the validation error with the custom exception.

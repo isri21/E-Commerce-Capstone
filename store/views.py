@@ -179,3 +179,46 @@ def wishlist_product(request, id):
 		return Response({
 			"error": "You have already added this product to your wish list."
 		}, status=status.HTTP_409_CONFLICT)
+	
+
+@api_view(["POST"])
+def review_product(request, id):
+	permission = IsAuthenticated() # Instantiate an IsAuthenticated permisison
+	# Check if the user doesn't have the permisison, if not retrun an error
+	if not permission.has_permission(request, None):
+		return Response({
+			"error": "You must be authenticated in order to add a product to your wish list, please send you authentication token in the request header."
+		}, status=status.HTTP_401_UNAUTHORIZED)
+	
+	# Get the user object
+	user = request.user
+
+	# Try to get the specific product, else return an error if it doesn't exist
+	try:
+		product = Product.objects.get(id=id)
+	except:
+		return Response({
+			"not_found": f"A product with an id [{id}] does not exist."
+		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Check if the data sent is a text/string
+	if not isinstance(request.data.get("review"), str):
+		return Response({
+			"error": "The review must be a string value."
+		}, status=status.HTTP_400_BAD_REQUEST)
+	
+	# Check if the user has purchased the product to review
+	purchased = Purchase.objects.filter(product=product, user=user)
+	if not purchased.exists():
+		return Response({
+			"error": "In order to review a product, you must first purchase it."
+		}, status=status.HTTP_403_FORBIDDEN)
+	
+	serializer = ReviewSerializer(data=request.data)
+	if serializer.is_valid(raise_exception=True):
+		serializer.save(user=user, product=product)
+		return Response({
+			"status": "You have successfully reviewed the product."
+		}, status=status.HTTP_201_CREATED)
+
+	
