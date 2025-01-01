@@ -221,4 +221,41 @@ def review_product(request, id):
 			"status": "You have successfully reviewed the product."
 		}, status=status.HTTP_201_CREATED)
 
+# View to rate a product	
+@api_view(["POST"])
+def rate_product(request, id):
+	permission = IsAuthenticated() # Instantiate an IsAuthenticated permisison
+	# Check if the user doesn't have the permisison, if not retrun an error
+	if not permission.has_permission(request, None):
+		return Response({
+			"error": "You must be authenticated in order to rate this product, please send you authentication token in the request header."
+		}, status=status.HTTP_401_UNAUTHORIZED)
+	
+	# Get the user object
+	user = request.user
+
+	# Try to get the specific product, else return an error if it doesn't exist
+	try:
+		product = Product.objects.get(id=id)
+	except:
+		return Response({
+			"not_found": f"A product with an id [{id}] does not exist."
+		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Check if the user has purchased the product to rate
+	purchased = Purchase.objects.filter(product=product, user=user)
+	if not purchased.exists():
+		return Response({
+			"error": "In order to rate a product, you must first purchase it."
+		}, status=status.HTTP_403_FORBIDDEN)
+	
+	serializer = RatingSerializer(data=request.data) # Serialize the incoming data
+	if serializer.is_valid(raise_exception=True): # Check if incoming data is valid.
+		# If data valid, pass the user and product object to the serializer and save it. 
+		serializer.save(user=user, product=product)
+		# Return success message
+		return Response({
+			"status": "You have successfully rated the product."
+		}, status=status.HTTP_201_CREATED)
+
 	

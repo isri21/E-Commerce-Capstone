@@ -131,3 +131,33 @@ class ReviewSerializer(serializers.ModelSerializer):
 			res = serializers.ValidationError({"error": "You have already reviewed this product."})
 			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
 			raise res # raise the validation error with the custom exception.
+
+# Serializer for the review model
+class RatingSerializer(serializers.ModelSerializer):
+	# Display the actual name of the user, instead of it's id
+	user = serializers.CharField(source="user.username", read_only=True)
+	# Display the actual name of the product, instead of it's id
+	product = serializers.CharField(source="product.name", read_only=True)
+	class Meta:
+		model = Rating
+		fields = ["user", "product", "rating", "rating_date", "edited_at"]
+		# Specify read only fields
+		read_only_fields = ["rating_date", "edited_at"]
+
+	# Create custom create method
+	def create(self, validated_data):
+		# Try to create the review, if integrity error is raised, return an error stating that.
+		try:
+			return Rating.objects.create(**validated_data)
+		except IntegrityError as e:
+			# Since if it is a unique constraint error raised the follwoing string will be in that error -
+			# message we set it to a variable.
+			unique_constraint_error = "UNIQUE constraint failed: account_rating.product_id, account_rating.user_id"
+			# Check if the exception raised was a unique constraint error
+			if unique_constraint_error in str(e):
+				res = serializers.ValidationError({"error": "You have already rated this product."})
+				res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
+				raise res # raise the validation error with the custom exception.
+			else: # Else it must be a check constraint error
+				raise serializers.ValidationError({"rating": "Value must be between 1 and 10."})
+			
