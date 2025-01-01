@@ -22,14 +22,15 @@ class Product(models.Model):
 	price = models.DecimalField(max_digits=6, decimal_places=2)
 	discount = models.PositiveIntegerField()
 	stock_quantity = models.PositiveIntegerField()
-	created_at = models.DateField(auto_now_add=True)
+	created_at = models.DateTimeField(auto_now_add=True)
 	category = models.ManyToManyField(Category, through="Product_Category", related_name="products")
 	owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner_products")
 
 	@property
 	def final_price(self):
 		if self.discount:
-			return (((self.discount/100) * self.price) + self.price)
+			discounted_price = float(self.price) - ((self.discount/100) * float(self.price))
+			return discounted_price
 		else:
 			return self.price
 		
@@ -73,7 +74,7 @@ class Purchase(models.Model):
 	price = models.DecimalField(max_digits=6, decimal_places=2)
 	discount = models.PositiveIntegerField()
 	quantity = models.PositiveIntegerField()
-	purchase_date = models.DateField(auto_now_add=True)
+	purchase_date = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):
 		return f"{self.user.username} | {self.product.name[:20]}"

@@ -31,7 +31,7 @@ def register(request):
 		}
 		return Response(response, status=status.HTTP_201_CREATED)
 
-@api_view(["POST"])
+@api_view(["GET"])
 def login(request):
 	# Deserialize the incoming login data
 	serializer = UserLoginSerializer(data=request.data)
