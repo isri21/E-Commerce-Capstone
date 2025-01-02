@@ -280,7 +280,7 @@ def rate_product(request, id):
 @api_view(["GET"])
 def list_all_categories(request):
 	# Get all the categories
-	categories = Category.objects.all()
+	categories = Category.objects.filter(is_deleted=False)
 
 	# Serialize the categories
 	serializer = CategorySerializer(categories, many=True)
