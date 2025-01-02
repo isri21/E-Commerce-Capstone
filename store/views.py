@@ -8,6 +8,7 @@ from .functions import CustomPagination
 from rest_framework.permissions import IsAuthenticated
 from account.models import *
 from django.db import IntegrityError
+from rest_framework.pagination import PageNumberPagination
 
 # View for getting all the proucts in the store
 @api_view(["GET"])
@@ -279,11 +280,18 @@ def rate_product(request, id):
 # View to list all the categories available	
 @api_view(["GET"])
 def list_all_categories(request):
+	# instantiate the custom paginator
+	paginator = PageNumberPagination()
+	paginator.page_size = 5
+	paginator.page_query_param = "per_page"
+
 	# Get all the categories
 	categories = Category.objects.filter(is_deleted=False)
 
+	# Paginate the queryset
+	paginated = paginator.paginate_queryset(categories, request)
 	# Serialize the categories
-	serializer = CategorySerializer(categories, many=True)
+	serializer = DetailCategorySerializer(paginated, many=True)
 
 	# Return serialized data, and status of 200
-	return Response(serializer.data, status=status.HTTP_200_OK)
+	return paginator.get_paginated_response(serializer.data)

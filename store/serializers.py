@@ -161,3 +161,46 @@ class RatingSerializer(serializers.ModelSerializer):
 			else: # Else it must be a check constraint error
 				raise serializers.ValidationError({"rating": "Value must be between 1 and 10."})
 			
+class DetailCategorySerializer(serializers.ModelSerializer):
+	creator = serializers.CharField(source="creator.username", read_only=True)
+	class Meta:
+		model = Category
+		fields = ["id", "creator", "name"]
+		read_only_fields = ["id"]
+
+	# Custom created method
+	def create(self, validated_data):
+		user = validated_data.pop("user") # get the user object passed during .save()
+		name = validated_data.get("name").lower() # convert the name sent in request to lower case
+
+		# Try to create the category object, if unable return error
+		# Reason converted to lower case is to check for duplicates, and since -
+		# there is unique constraint on the field if unable to create the category -
+		# the reason is duplicate names.
+		try:
+			category = Category.objects.create(creator=user, name=name)
+		except IntegrityError as e:
+			res = serializers.ValidationError({"name": "There already exists a category with this name."})
+			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
+			raise res # raise the validation error with the custom exception.
+		return category
+	
+	def update(self, instance, validated_data):
+		# convert the name sent in request to lower case
+		validated_data["name"] = validated_data.get("name").lower()
+
+		for field, value in validated_data.items():
+			try:
+				setattr(instance, field, value)
+			except IntegrityError as e:
+				res = serializers.ValidationError({"name": "There already exists a category with this name."})
+				res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
+				raise res # raise the validation error with the custom exception.
+		instance.save()
+		return instance
+	
+	# Capitalize the category name when sending it back in the response, or when serializing it.
+	def to_representation(self, instance):
+		data = super().to_representation(instance)
+		data["name"] = data["name"].capitalize()
+		return data

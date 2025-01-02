@@ -12,6 +12,11 @@ class Category(models.Model):
 	creator = models.ForeignKey(User, on_delete=models.CASCADE)
 	is_deleted = models.BooleanField(default=False)
 
+	class Meta:
+		constraints = [
+			models.UniqueConstraint(fields=["name"], name="unique_category_name")
+		]
+
 	def __str__(self):
 		return self.name
 	
