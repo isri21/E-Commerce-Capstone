@@ -9,15 +9,14 @@ from rest_framework.permissions import IsAuthenticated
 from account.models import *
 from django.db import IntegrityError
 
-
 # View for getting all the proucts in the store
 @api_view(["GET"])
 def list_product_view(request):
 	# instantiate the custom paginator
 	paginator = CustomPagination()
 
-	# fetch all the products using prefetch_related for optimization
-	products = Product.objects.prefetch_related("category")
+	# fetch all the products using prefetch_related for optimization, and only show product that are not marked deleted
+	products = Product.objects.prefetch_related("category").filter(is_deleted=False)
 
 	# get the query parameters
 	search = request.GET.get("search", None)
@@ -104,7 +103,6 @@ def list_product_view(request):
 	# Reutrn the serialized quieryset along with addtional information (meta-data)
 	return paginator.get_paginated_response(serializer.data)
 
-
 # View for getting a products details
 @api_view(["GET", "POST"])
 def detail_product_view(request, id):
@@ -121,6 +119,10 @@ def detail_product_view(request, id):
 		try:
 			product = Product.objects.get(id=id)
 		except:
+			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
+		
+		# Check if product is marked deleted, if it is, return a not found
+		if product.is_deleted == True:
 			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 		
 		# Serialize the incoming, data (quantity to purchase)
@@ -142,6 +144,10 @@ def detail_product_view(request, id):
 		try:
 			product = Product.objects.get(id=id)
 		except:
+			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
+		
+		# Check if product is deleted, if it is, return a not found
+		if product.is_deleted == True:
 			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 	
 	# If product exists, serialize it and return serialized data along with a 200 OK
@@ -166,8 +172,12 @@ def wishlist_product(request, id):
 		product = Product.objects.get(id=id)
 	except:
 		return Response({
-			"not_found": f"A product with an id [{id}] does not exist."
+			"not_found": "Product does not exist."
 		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Check if product is marked deleted, if it is, return a not found
+	if product.is_deleted == True:
+		return Response({"error": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 	
 	# Try to create the wishlist item, if integrity error is raised, return an error stating that.
 	try:
@@ -198,9 +208,13 @@ def review_product(request, id):
 		product = Product.objects.get(id=id)
 	except:
 		return Response({
-			"not_found": f"A product with an id [{id}] does not exist."
+			"error": "Product does not exist."
 		}, status=status.HTTP_404_NOT_FOUND)
 	
+	# Check if product is marked deleted, if it is, return a not found
+	if product.is_deleted == True:
+		return Response({"error": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
 	# Check if the data sent is a text/string
 	if not isinstance(request.data.get("review"), str):
 		return Response({
@@ -239,8 +253,12 @@ def rate_product(request, id):
 		product = Product.objects.get(id=id)
 	except:
 		return Response({
-			"not_found": f"A product with an id [{id}] does not exist."
+			"error": "Product does not exist."
 		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Check if product is marked deleted, if it is, return a not found
+	if product.is_deleted == True:
+		return Response({"error": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 	
 	# Check if the user has purchased the product to rate
 	purchased = Purchase.objects.filter(product=product, user=user)
@@ -257,5 +275,3 @@ def rate_product(request, id):
 		return Response({
 			"status": "You have successfully rated the product."
 		}, status=status.HTTP_201_CREATED)
-
-	
