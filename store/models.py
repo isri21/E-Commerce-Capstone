@@ -25,6 +25,7 @@ class Product(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	category = models.ManyToManyField(Category, through="Product_Category", related_name="products")
 	owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner_products")
+	is_deleted = models.BooleanField(default=False)
 
 	@property
 	def final_price(self):
