@@ -7,7 +7,8 @@ from .permissions import IsUser, IsCategoryOwner
 from rest_framework.permissions import IsAuthenticated
 from store.serializers import GeneralProductsSerializer, DetailCategorySerializer
 from rest_framework.pagination import PageNumberPagination
-from store.models import Product, Category, Product_Category
+from store.models import Product, Category, Product_Category, Purchase
+from account.models import Wishlist, Review, Rating
 
 User = get_user_model()
 
@@ -149,3 +150,55 @@ def manage_categories(request, username, id):
 		category.is_deleted = True
 		category.save()
 		return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# View for viewing wishlist item of authenticated user
+@api_view(["GET"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view
+def list_wishlist_items(request, username):
+	# get user object
+	user = request.user
+
+	# Check if username in the path parameter is different
+	if not username == user.username:
+		return Response({
+			"authorization_error": "You can not view another users wishlist.",
+			"username": "Please specify your own username in the path parameter."
+		}, status=status.HTTP_401_UNAUTHORIZED)
+			
+	# Query wishlist based on user
+	wishlist = Wishlist.objects.filter(user=user)
+	# If queryset empty return error
+	if not wishlist.exists():
+		return Response({
+			"no_products": "You have no products in you wishlist."
+		}, status=status.HTTP_204_NO_CONTENT)
+	
+	# If not empty reutrn data
+	serializer = WishListSerializer(wishlist, many=True)
+	return Response(serializer.data, status=status.HTTP_200_OK)
+
+# View for deleting wish list item of authenticated user
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view
+def delete_wishlist_item(request, username, id):
+	# Get authenticated user
+	user = request.user
+	# Check if different user specified in pathparameter, if so return error
+	if not user.username == username:
+		return Response({
+			"authorizatoin_error": "You can only manage products in your own wishlist",
+			"username": "Please specify your own username in the path parameter."
+		}, status=status.HTTP_401_UNAUTHORIZED)
+	
+	# Try to get the wishlist item, if can't return error
+	try:
+		item = Wishlist.objects.get(id=id, user=user)
+	except Wishlist.DoesNotExist:
+		return Response({
+			"error": "This product is not in your wishlst"
+		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Delete wish list item 
+	item.delete()
+	return Response(status=status.HTTP_204_NO_CONTENT)
