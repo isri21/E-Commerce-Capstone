@@ -275,3 +275,15 @@ def rate_product(request, id):
 		return Response({
 			"status": "You have successfully rated the product."
 		}, status=status.HTTP_201_CREATED)
+	
+# View to list all the categories available	
+@api_view(["GET"])
+def list_all_categories(request):
+	# Get all the categories
+	categories = Category.objects.all()
+
+	# Serialize the categories
+	serializer = CategorySerializer(categories, many=True)
+
+	# Return serialized data, and status of 200
+	return Response(serializer.data, status=status.HTTP_200_OK)
