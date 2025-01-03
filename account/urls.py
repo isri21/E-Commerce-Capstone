@@ -7,4 +7,5 @@ urlpatterns = [
 	path("category/<int:id>/", views.manage_categories),
 	path("wishlist/", views.list_wishlist_items),
 	path("wishlist/<int:id>/", views.delete_wishlist_item),
+	path("purchases/", views.list_purchases),
 ]

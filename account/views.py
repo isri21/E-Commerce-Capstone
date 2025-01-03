@@ -202,3 +202,30 @@ def delete_wishlist_item(request, username, id):
 	# Delete wish list item 
 	item.delete()
 	return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view
+def list_purchases(request, username):
+	# Get the user
+	user = request.user
+	x = username
+	# Create paginator
+	paginator = BasicPagination()
+
+	# Query purchase based on user
+	purchases = Purchase.objects.filter(user=user).order_by("-purchase_date")
+
+	# Check if empty and return status
+	if not purchases.exists():
+		return Response({
+			"no_items": "You have no purchased products."
+		}, status=status.HTTP_204_NO_CONTENT)
+
+	# Paginate data
+	paginated = paginator.paginate_queryset(purchases, request)
+
+	# Serialized the paginated data
+	serializer = ProfilePurchasesSerialzier(paginated, many=True)
+
+	# Return paginated data
+	return paginator.get_paginated_response(serializer.data)
