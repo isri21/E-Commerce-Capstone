@@ -116,11 +116,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 	user = serializers.CharField(source="user.username", read_only=True)
 	# Display the actual name of the product, instead of it's id
 	product = serializers.CharField(source="product.name", read_only=True)
+	review_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+	edited_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+	review_id = serializers.CharField(source="id", read_only=True)
 	class Meta:
 		model = Review
-		fields = ["user", "product", "review", "review_date", "edited_at"]
-		# Specify read only fields
-		read_only_fields = ["review_date", "edited_at"]
+		fields = ["review_id", "user", "product", "review", "review_date", "edited_at"]
 
 	# Create custom create method
 	def create(self, validated_data):
@@ -131,6 +132,33 @@ class ReviewSerializer(serializers.ModelSerializer):
 			res = serializers.ValidationError({"error": "You have already reviewed this product."})
 			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
 			raise res # raise the validation error with the custom exception.
+		
+	def update(self, instance, validated_data):
+		# Get the review from the validated data
+		updated_review = validated_data["review"]
+
+		# Update the reiview of the instance
+		instance.review = updated_review
+		instance.save()
+		
+		return instance
+	
+	def to_representation(self, instance):
+		data =  super().to_representation(instance)
+
+		# Check if the include user context was passed
+		# If passed it will be sent ase {"include_user": False}
+		# If we it is False remove it from serializer.data, if it is not specified keep it
+		include_user = self.context.get("include_user", True)
+		include_id = self.context.get("include_id", True)
+		if not include_user:
+			data.pop("user")
+		
+		if not include_id:
+			data.pop("id")
+
+		return data
+
 
 # Serializer for the review model
 class RatingSerializer(serializers.ModelSerializer):

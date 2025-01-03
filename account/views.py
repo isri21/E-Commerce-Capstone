@@ -3,12 +3,12 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import get_user_model
 from .serializers import *
-from .permissions import IsUser, IsCategoryOwner
+from .permissions import IsCategoryOwner, IsReviewOwner
 from rest_framework.permissions import IsAuthenticated
-from store.serializers import GeneralProductsSerializer, DetailCategorySerializer
+from store.serializers import DetailCategorySerializer, ReviewSerializer
 from store.functions import BasicPagination
 from store.models import Product, Category, Product_Category, Purchase
-from account.models import Wishlist, Review, Rating
+from .models import Wishlist, Review
 
 User = get_user_model()
 
@@ -202,3 +202,62 @@ def list_purchases(request):
 
 	# Return paginated data
 	return paginator.get_paginated_response(serializer.data)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view
+def list_reviews(request):
+	# Get the user
+	user = request.user
+
+	# Query reviews based on user
+	reviews = Review.objects.filter(user=user)
+
+	# Check if queryset is empty
+	if not reviews.exists():
+		return Response({
+			"no_reviews": "You have not reviewd any products yet."
+		}, status=status.HTTP_204_NO_CONTENT)
+	
+	# Paginate the query
+	paginator = BasicPagination()
+	paginated = paginator.paginate_queryset(reviews, request)
+
+	# Serialize the paginated queryset
+	serializer = ReviewSerializer(paginated, many=True, context={"include_user": False})
+	# return the data
+	return paginator.get_paginated_response(serializer.data)
+
+@api_view(["PATCH", "DELETE"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view
+def manage_reviews(request, id):
+	# Try to get the review, if not exist return error
+	try:
+		review = Review.objects.get(id=id)
+	except Review.DoesNotExist:
+		return Response({
+			"error": "Review does not exist."
+		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Check if the user is the owner of the review
+	permission = IsReviewOwner()
+	if not permission.has_object_permission(request, review):
+		return Response({
+			"authorization_error": "Only the owner of the review can manage it."
+		}, status=status.HTTP_401_UNAUTHORIZED)
+
+	# Logic for updating a review
+	if request.method == "PATCH":
+		# Serialize the incoming data, the review
+		serializer = ReviewSerializer(instance=review, data=request.data, context={"include_user": False})
+		# Check if data is valid and send error if not.
+		if serializer.is_valid(raise_exception=True):
+			serializer.save()
+			return Response({
+				"status": "You have succesfully updated your review.",
+				"updated_review": serializer.data
+			}, status=status.HTTP_200_OK)
+		
+	# Logic of deleting a reiview
+	if request.method == "DELETE":
+		review.delete()
+		return Response(status=status.HTTP_204_NO_CONTENT)
