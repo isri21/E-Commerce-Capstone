@@ -4,7 +4,7 @@ from rest_framework.permissions import BasePermission
 
 
 class CustomPagination(PageNumberPagination):
-	page_size = 2
+	page_size = 3
 	page_size_query_param = "per_page"
 
 	def get_paginated_response(self, data):
@@ -17,5 +17,8 @@ class CustomPagination(PageNumberPagination):
 			'previous_page': self.get_previous_link(),
 			'results': data
 		})
+class BasicPagination(PageNumberPagination):
+	page_size = 3
+	page_size_query_param = "per_page"
 
 

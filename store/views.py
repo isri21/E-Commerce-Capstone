@@ -4,11 +4,10 @@ from .serializers import *
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
-from .functions import CustomPagination
+from .functions import CustomPagination, BasicPagination
 from rest_framework.permissions import IsAuthenticated
 from account.models import *
 from django.db import IntegrityError
-from rest_framework.pagination import PageNumberPagination
 
 # View for getting all the proucts in the store
 @api_view(["GET"])
@@ -281,7 +280,7 @@ def rate_product(request, id):
 @api_view(["GET"])
 def list_all_categories(request):
 	# instantiate the custom paginator
-	paginator = PageNumberPagination()
+	paginator = BasicPagination()
 	paginator.page_size = 5
 	paginator.page_query_param = "per_page"
 

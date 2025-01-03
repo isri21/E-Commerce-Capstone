@@ -6,7 +6,7 @@ from .serializers import *
 from .permissions import IsUser, IsCategoryOwner
 from rest_framework.permissions import IsAuthenticated
 from store.serializers import GeneralProductsSerializer, DetailCategorySerializer
-from rest_framework.pagination import PageNumberPagination
+from store.functions import BasicPagination
 from store.models import Product, Category, Product_Category, Purchase
 from account.models import Wishlist, Review, Rating
 
@@ -63,7 +63,7 @@ def list_create_categories(request, username):
 	# Logic for GET method
 	if request.method == "GET":
 		# instantiate the custom paginator
-		paginator = PageNumberPagination()
+		paginator = BasicPagination()
 		paginator.page_size = 5
 		paginator.page_query_param = "per_page"
 
