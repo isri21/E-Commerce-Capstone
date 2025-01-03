@@ -116,6 +116,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 	user = serializers.CharField(source="user.username", read_only=True)
 	# Display the actual name of the product, instead of it's id
 	product = serializers.CharField(source="product.name", read_only=True)
+	# Format the dates
 	review_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 	edited_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 	review_id = serializers.CharField(source="id", read_only=True)
@@ -166,9 +167,12 @@ class RatingSerializer(serializers.ModelSerializer):
 	user = serializers.CharField(source="user.username", read_only=True)
 	# Display the actual name of the product, instead of it's id
 	product = serializers.CharField(source="product.name", read_only=True)
+	# Format the dates 
+	rating_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+	edited_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 	class Meta:
 		model = Rating
-		fields = ["user", "product", "rating", "rating_date", "edited_at"]
+		fields = ["id", "user", "product", "rating", "rating_date", "edited_at"]
 		# Specify read only fields
 		read_only_fields = ["rating_date", "edited_at"]
 
@@ -188,6 +192,32 @@ class RatingSerializer(serializers.ModelSerializer):
 				raise res # raise the validation error with the custom exception.
 			else: # Else it must be a check constraint error
 				raise serializers.ValidationError({"rating": "Value must be between 1 and 10."})
+		
+	def update(self, instance, validated_data):
+		# Get the rating from the validated data
+		updated_rating = validated_data["rating"]
+
+		# Update the reiview of the instance
+		instance.rating = updated_rating
+		instance.save()
+		
+		return instance
+	
+	def to_representation(self, instance):
+		data =  super().to_representation(instance)
+
+		# Check if the include user context was passed
+		# If passed it will be sent ase {"include_user": False}
+		# If we it is False remove it from serializer.data, if it is not specified keep it
+		include_user = self.context.get("include_user", True)
+		include_id = self.context.get("include_id", True)
+		if not include_user:
+			data.pop("user")
+		
+		if not include_id:
+			data.pop("id")
+
+		return data
 			
 class DetailCategorySerializer(serializers.ModelSerializer):
 	creator = serializers.CharField(source="creator.username", read_only=True)

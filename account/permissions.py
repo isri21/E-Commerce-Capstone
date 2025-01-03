@@ -10,7 +10,12 @@ class IsCategoryOwner(BasePermission):
 	def has_object_permission(self, request, category):
 		return request.user == category.creator
 	
-# Checks if the profile belongs to the authenticated user
+# Checks if the review belongs to the authenticated user
 class IsReviewOwner(BasePermission):
 	def has_object_permission(self, request, review):
 		return request.user == review.user
+	
+# Checks if the rating belongs to the authenticated user
+class IsRatingOwner(BasePermission):
+	def has_object_permission(self, request, rating):
+		return request.user == rating.user

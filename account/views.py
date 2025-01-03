@@ -3,12 +3,12 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import get_user_model
 from .serializers import *
-from .permissions import IsCategoryOwner, IsReviewOwner
+from .permissions import IsCategoryOwner, IsReviewOwner, IsRatingOwner
 from rest_framework.permissions import IsAuthenticated
-from store.serializers import DetailCategorySerializer, ReviewSerializer
+from store.serializers import DetailCategorySerializer, ReviewSerializer, RatingSerializer
 from store.functions import BasicPagination
 from store.models import Product, Category, Product_Category, Purchase
-from .models import Wishlist, Review
+from .models import Wishlist, Review, Rating
 
 User = get_user_model()
 
@@ -260,4 +260,63 @@ def manage_reviews(request, id):
 	# Logic of deleting a reiview
 	if request.method == "DELETE":
 		review.delete()
+		return Response(status=status.HTTP_204_NO_CONTENT)
+	
+@api_view(["GET"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view
+def list_ratings(request):
+	# Get the user
+	user = request.user
+
+	# Query ratings based on user
+	ratings = Rating.objects.filter(user=user)
+
+	# Check if queryset is empty
+	if not ratings.exists():
+		return Response({
+			"no_ratings": "You have not rated any products yet."
+		}, status=status.HTTP_204_NO_CONTENT)
+	
+	# Paginate the query
+	paginator = BasicPagination()
+	paginated = paginator.paginate_queryset(ratings, request)
+
+	# Serialize the paginated queryset
+	serializer = RatingSerializer(paginated, many=True, context={"include_user": False})
+	# return the data
+	return paginator.get_paginated_response(serializer.data)
+
+@api_view(["PATCH", "DELETE"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view
+def manage_ratings(request, id):
+	# Try to get the ratings, if not exist return error
+	try:
+		rating = Rating.objects.get(id=id)
+	except Rating.DoesNotExist:
+		return Response({
+			"error": "Rating does not exist."
+		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Check if the user is the owner of the rating
+	permission = IsRatingOwner()
+	if not permission.has_object_permission(request, rating):
+		return Response({
+			"authorization_error": "Only the owner of the rating can manage it."
+		}, status=status.HTTP_401_UNAUTHORIZED)
+
+	# Logic for updating a rating
+	if request.method == "PATCH":
+		# Serialize the incoming data, the rating
+		serializer = RatingSerializer(instance=rating, data=request.data, context={"include_user": False})
+		# Check if data is valid and send error if not.
+		if serializer.is_valid(raise_exception=True):
+			serializer.save()
+			return Response({
+				"status": "You have succesfully updated your rating.",
+				"updated_rating": serializer.data
+			}, status=status.HTTP_200_OK)
+		
+	# Logic of deleting a reiview
+	if request.method == "DELETE":
+		rating.delete()
 		return Response(status=status.HTTP_204_NO_CONTENT)
