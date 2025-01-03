@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from account.models import *
-from django.db import IntegrityError
+from django.db.utils import IntegrityError
 from rest_framework import status
 
 # Serializer for the Image model to be nested into the GeneralProductsSerializer
@@ -179,7 +179,7 @@ class DetailCategorySerializer(serializers.ModelSerializer):
 		# the reason is duplicate names.
 		try:
 			category = Category.objects.create(creator=user, name=name)
-		except IntegrityError as e:
+		except IntegrityError:
 			res = serializers.ValidationError({"name": "There already exists a category with this name."})
 			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
 			raise res # raise the validation error with the custom exception.
@@ -187,16 +187,18 @@ class DetailCategorySerializer(serializers.ModelSerializer):
 	
 	def update(self, instance, validated_data):
 		# convert the name sent in request to lower case
+		print(validated_data)
 		validated_data["name"] = validated_data.get("name").lower()
 
-		for field, value in validated_data.items():
-			try:
-				setattr(instance, field, value)
-			except IntegrityError as e:
-				res = serializers.ValidationError({"name": "There already exists a category with this name."})
-				res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
-				raise res # raise the validation error with the custom exception.
-		instance.save()
+		# Try to update the instance name
+		try:
+			instance.name = validated_data["name"]
+			instance.save()
+		except IntegrityError:
+			res = serializers.ValidationError({"name": "There already exists a category with this name."})
+			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
+			raise res # raise the validation error with the custom exception.
+	
 		return instance
 	
 	# Capitalize the category name when sending it back in the response, or when serializing it.
