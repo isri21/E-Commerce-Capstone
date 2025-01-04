@@ -29,7 +29,7 @@ class Product(models.Model):
 	discount = models.PositiveIntegerField()
 	stock_quantity = models.PositiveIntegerField()
 	created_at = models.DateTimeField(auto_now_add=True)
-	category = models.ManyToManyField(Category, through="Product_Category", related_name="products")
+	category = models.ManyToManyField(Category, through="Product_Category", related_name="products", blank=True)
 	owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner_products")
 	is_deleted = models.BooleanField(default=False)
 
@@ -37,9 +37,10 @@ class Product(models.Model):
 	def final_price(self):
 		if self.discount:
 			discounted_price = float(self.price) - ((self.discount/100) * float(self.price))
-			return discounted_price
+			return float(f"{discounted_price:.2f}")
 		else:
-			return self.price
+			discounted_price = self.price
+			return float(f"{discounted_price:.2f}")
 		
 	def __str__(self):
 		return self.name

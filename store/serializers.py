@@ -3,6 +3,7 @@ from .models import *
 from account.models import *
 from django.db.utils import IntegrityError
 from rest_framework import status
+import os
 
 # Serializer for the Image model to be nested into the GeneralProductsSerializer
 class ImageSerializer(serializers.ModelSerializer):
@@ -37,7 +38,7 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 
 
 # Serializer for detail view of specific products
-class DetailProdcutSerializer(serializers.ModelSerializer):
+class ViewDetailProdcutSerializer(serializers.ModelSerializer):
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
 	posted_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", source="created_at") # Change the name of the created_date field to posted_at
 	images = ImageSerializer(many=True) 
@@ -263,4 +264,91 @@ class DetailCategorySerializer(serializers.ModelSerializer):
 	def to_representation(self, instance):
 		data = super().to_representation(instance)
 		data["name"] = data["name"].capitalize()
+		return data
+	
+# Serializer for the list view of all the products
+class GeneralProductsSerializer(serializers.ModelSerializer):
+	images = ImageSerializer(many=True)
+	category = CategorySerializer(many=True)
+	class Meta:
+		model = Product
+		fields = ["id",	"name", "images", "category", "stock_quantity"]
+
+
+# Serializer for creating a product
+class CreateProductSerialzier(serializers.ModelSerializer):
+	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
+	posted_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", source="created_at", read_only=True) # Change the name of the created_date field to posted_at
+	images = serializers.ListField(child=serializers.ImageField()) # Use a list field since the image will be sent as a list
+	category = serializers.ListField(child=serializers.CharField(), write_only=True) # Use a list field since the categories will be sent as a list
+	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
+	class Meta:
+		model = Product
+		fields = [
+			"id", "owner", "name",	"description",	"original_price", "discount_percent",
+			"final_price", "stock_quantity", "category", "images", "posted_at"
+		]
+		read_only_fields = ["owner"]
+
+	# Check if the price entered is greater than 0
+	def validate_original_price(self, value):
+		if value <= 0:
+			raise serializers.ValidationError("Must be a number greater than 0.")
+		return value
+	
+	# Check if the discount percent is between 0 and 100
+	def validate_discount_percent(self, value):
+		if value < 0 or value > 100:
+			raise serializers.ValidationError("Must be a percentage value between 0 and 100.")
+		return value
+	
+	# Check if the stock quantity is not less than 0
+	def validate_stock_quantity(self, value):
+		if value < 0:
+			raise serializers.ValidationError("Can not be a number less than 0.")
+		return value
+
+	# Check if the categories specifed all exist
+	def validate_category(self, value):
+		for category in value:
+			category_lower = category.lower()
+			try:
+				Category.objects.get(name=category_lower)
+			except Category.DoesNotExist:
+				print(category)
+				raise serializers.ValidationError({f"{category}": "This category does not exist. If you want to use it, create it first."})
+		return value
+	
+	# Check if the image is jpg or png
+	def validate_images(self, value):
+		for image in value:
+			if image.content_type not in ["image/jpeg", "image/jpg", "image/png"]:
+				raise serializers.ValidationError(f"[{os.path.basename(image.name)}] is not a JPG, JPEG or PNG file.")
+		return value
+
+	def create(self, validated_data):
+		# Extract and remove images and category from validated data
+		images = validated_data.pop("images")
+		category = validated_data.pop("category")
+
+		# Create the product instance				
+		product = Product.objects.create(**validated_data)
+
+		# Add the categories to the product
+		for item in category:
+			category_item = Category.objects.get(name=item.lower())
+			product.category.add(category_item)
+
+		# Relate the images with the product
+		for image in images:
+			try:
+				Image.objects.create(product=product, image=image)
+			except Exception as e:
+				raise serializers.ValidationError(f"Unable to create image: {e}")
+		return product
+	
+	def to_representation(self, instance):
+		# When calling .data attribute only return the id of the instance created/updated
+		# This is used to use another serializer to serialize the detail product.
+		data = {"id": instance.id}
 		return data

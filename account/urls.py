@@ -12,4 +12,5 @@ urlpatterns = [
 	path("reviews/<int:id>/", views.manage_reviews),
 	path("ratings/", views.list_ratings),
 	path("ratings/<int:id>/", views.manage_ratings),
+	path("products/", views.list_create_products),
 ]

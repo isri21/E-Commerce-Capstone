@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from .serializers import *
 from .permissions import IsCategoryOwner, IsReviewOwner, IsRatingOwner
 from rest_framework.permissions import IsAuthenticated
-from store.serializers import DetailCategorySerializer, ReviewSerializer, RatingSerializer
+from store.serializers import DetailCategorySerializer, ReviewSerializer, RatingSerializer, GeneralProductsSerializer, CreateProductSerialzier, ViewDetailProdcutSerializer
 from store.functions import BasicPagination
 from store.models import Product, Category, Product_Category, Purchase
 from .models import Wishlist, Review, Rating
@@ -320,3 +320,40 @@ def manage_ratings(request, id):
 	if request.method == "DELETE":
 		rating.delete()
 		return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view
+def list_create_products(request):
+	# get the user
+	user = request.user
+	if request.method == "GET":
+	
+		# Query the model based on the user
+		products = Product.objects.filter(owner=user)
+
+		# Check if the Query is empty, if it is return an error
+		if not products.exists():
+			return Response({
+				"no_products": "You have not created any products yet."
+			}, status=status.HTTP_204_NO_CONTENT)
+		
+		# Paginate the queryset
+		paginator = BasicPagination()
+		paginated = paginator.paginate_queryset(products, request)
+
+		# If it is not empty serialize and return it
+		serializer = GeneralProductsSerializer(paginated, many=True)
+		return paginator.get_paginated_response(serializer.data)
+	
+	if request.method == "POST":
+		# print(request.data)
+		serializer = CreateProductSerialzier(data=request.data)
+		if serializer.is_valid(raise_exception=True):
+			serializer.save(owner=user)
+			id = serializer.data["id"]
+			new_product = Product.objects.get(id=id)
+			new_serializer = ViewDetailProdcutSerializer(new_product)
+			return Response({
+				"status": "successfully created",
+				"product": new_serializer.data
+			})
