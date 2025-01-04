@@ -329,7 +329,7 @@ def list_create_products(request):
 	if request.method == "GET":
 	
 		# Query the model based on the user
-		products = Product.objects.filter(owner=user)
+		products = Product.objects.filter(owner=user, is_deleted=False)
 
 		# Check if the Query is empty, if it is return an error
 		if not products.exists():
@@ -366,7 +366,7 @@ def manage_products(request, id):
 
 	# Try to get the product, if not exist return error
 	try:
-		product = Product.objects.get(id=id)
+		product = Product.objects.get(id=id, is_deleted=False)
 	except Product.DoesNotExist:
 		return Response({
 				"no_product": "Product does not exist.",
@@ -397,5 +397,6 @@ def manage_products(request, id):
 	# Logic for deleting a product
 	if request.method == "DELETE":
 		# Mark the product as deleted
-		product.is_deleted == True
+		product.is_deleted = True
+		product.save()
 		return Response(status=status.HTTP_204_NO_CONTENT)

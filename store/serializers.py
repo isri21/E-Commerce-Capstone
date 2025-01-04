@@ -41,7 +41,6 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 class ViewDetailProdcutSerializer(serializers.ModelSerializer):
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
 	posted_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", source="created_at") # Change the name of the created_date field to posted_at
-	edited_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S") # Change the name of the created_date field to posted_at
 	images = ImageSerializer(many=True) 
 	category = CategorySerializer(many=True)
 	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
@@ -59,7 +58,6 @@ class ViewDetailProdcutSerializer(serializers.ModelSerializer):
 			"category",
 			"images",
 			"posted_at",
-			"edited_at"
 		]
 
 # Serializer for purchasing products

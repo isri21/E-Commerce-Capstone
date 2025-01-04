@@ -281,8 +281,6 @@ def rate_product(request, id):
 def list_all_categories(request):
 	# instantiate the custom paginator
 	paginator = BasicPagination()
-	paginator.page_size = 5
-	paginator.page_query_param = "per_page"
 
 	# Get all the categories
 	categories = Category.objects.filter(is_deleted=False)
@@ -293,4 +291,31 @@ def list_all_categories(request):
 	serializer = DetailCategorySerializer(paginated, many=True)
 
 	# Return serialized data, and status of 200
+	return paginator.get_paginated_response(serializer.data)
+
+# View to list all reviews for a product
+@api_view(["GET"])
+def list_product_reviews(request, id):
+	# Try to get the specific product, else return an error if it doesn't exist
+	try:
+		product = Product.objects.get(id=id)
+	except:
+		return Response({
+			"error": "Product does not exist."
+		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Get reviews, and check if they are empty
+	reviews = Review.objects.filter(product=product)
+	if not reviews.exists():
+		return Response({
+			"no_reviews": "There are no reviews for this product",
+		}, status=status.HTTP_204_NO_CONTENT)
+	
+	# Paginate
+	paginator = BasicPagination()
+	paginated = paginator.paginate_queryset(reviews, request)
+
+	# Serialize paginated reviews
+	serializer = ReviewSerializer(paginated, many=True)
+
 	return paginator.get_paginated_response(serializer.data)
