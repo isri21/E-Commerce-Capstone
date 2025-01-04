@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import get_user_model
 from .serializers import *
-from .permissions import IsCategoryOwner, IsReviewOwner, IsRatingOwner
+from .permissions import *
 from rest_framework.permissions import IsAuthenticated
 from store.serializers import DetailCategorySerializer, ReviewSerializer, RatingSerializer, GeneralProductsSerializer, CreateProductSerialzier, ViewDetailProdcutSerializer
 from store.functions import BasicPagination
@@ -349,11 +349,53 @@ def list_create_products(request):
 		# print(request.data)
 		serializer = CreateProductSerialzier(data=request.data)
 		if serializer.is_valid(raise_exception=True):
-			serializer.save(owner=user)
-			id = serializer.data["id"]
-			new_product = Product.objects.get(id=id)
-			new_serializer = ViewDetailProdcutSerializer(new_product)
+			serializer.save(owner=user) # Save the product if valid
+			id = serializer.data["id"] # Get the prodcut id of saved product
+			new_product = Product.objects.get(id=id) # Get the saved prodcut form the model
+			new_serializer = ViewDetailProdcutSerializer(new_product) # Serialize the new product
 			return Response({
-				"status": "successfully created",
-				"product": new_serializer.data
-			})
+				"status": "Successfully Created a New Product",
+				"product": new_serializer.data # Return the new product details
+			}, status=status.HTTP_201_CREATED)
+
+@api_view(["PATCH", "DELETE"])
+@permission_classes([IsAuthenticated]) # Only authenticated users can access view	
+def manage_products(request, id):
+	# Get the user
+	user = request.user
+
+	# Try to get the product, if not exist return error
+	try:
+		product = Product.objects.get(id=id)
+	except Product.DoesNotExist:
+		return Response({
+				"no_product": "Product does not exist.",
+			}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Check if user has permission to manage product
+	permission = IsProductOwner()
+	if not permission.has_object_permission(request, product):
+		return Response({
+				"authorization_error": "Only the owner of the product can manage it.",
+			}, status=status.HTTP_401_UNAUTHORIZED)
+	
+	# Logic for Updating product
+	if request.method == "PATCH":
+		# Serialize incoming data while bining it to the product and enabling partial update
+		serializer = CreateProductSerialzier(instance=product, data=request.data, partial=True)
+		# Check incoming data validity, if not return error
+		if serializer.is_valid(raise_exception=True):
+			serializer.save(owner=user) # Save the product if valid
+			id = serializer.data["id"] # Get the prodcut id of saved product
+			new_product = Product.objects.get(id=id) # Get the saved prodcut form the model
+			new_serializer = ViewDetailProdcutSerializer(new_product) # Serialize the new product
+			return Response({
+				"status": "Successfully Updated the Product",
+				"product": new_serializer.data # Return the new product details
+			}, status=status.HTTP_200_OK)
+		
+	# Logic for deleting a product
+	if request.method == "DELETE":
+		# Mark the product as deleted
+		product.is_deleted == True
+		return Response(status=status.HTTP_204_NO_CONTENT)

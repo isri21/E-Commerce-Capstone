@@ -151,7 +151,7 @@ def detail_product_view(request, id):
 			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 	
 	# If product exists, serialize it and return serialized data along with a 200 OK
-	serializer = DetailProdcutSerializer(product)
+	serializer = ViewDetailProdcutSerializer(product)
 	return Response(serializer.data, status=status.HTTP_200_OK)
 
 # View for adding a product to a wishlist

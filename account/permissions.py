@@ -19,3 +19,8 @@ class IsReviewOwner(BasePermission):
 class IsRatingOwner(BasePermission):
 	def has_object_permission(self, request, rating):
 		return request.user == rating.user
+	
+# Checks if the product belongs to the authenticated user
+class IsProductOwner(BasePermission):
+	def has_object_permission(self, request, product):
+		return request.user == product.owner

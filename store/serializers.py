@@ -41,6 +41,7 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 class ViewDetailProdcutSerializer(serializers.ModelSerializer):
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
 	posted_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", source="created_at") # Change the name of the created_date field to posted_at
+	edited_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S") # Change the name of the created_date field to posted_at
 	images = ImageSerializer(many=True) 
 	category = CategorySerializer(many=True)
 	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
@@ -57,7 +58,8 @@ class ViewDetailProdcutSerializer(serializers.ModelSerializer):
 			"stock_quantity",
 			"category",
 			"images",
-			"posted_at"
+			"posted_at",
+			"edited_at"
 		]
 
 # Serializer for purchasing products
@@ -346,6 +348,43 @@ class CreateProductSerialzier(serializers.ModelSerializer):
 			except Exception as e:
 				raise serializers.ValidationError(f"Unable to create image: {e}")
 		return product
+	
+	def update(self, instance, validated_data):
+		# Remove category and images from the validated_data if they exist
+		categories = validated_data.pop("category", None)
+		images = validated_data.pop("images", None)
+
+		# Save the rest of the validated_data
+		for field, value in validated_data.items():
+			setattr(instance, field, value)
+
+		# If category exist 
+		if categories:
+			# Remove their previous relations
+			instance.category.clear()
+	
+			# Creat new relation with new categoires
+			for category in categories:
+				category_item = Category.objects.get(name=category.lower())
+				instance.category.add(category_item)
+		
+		# Save the instance
+		instance.save()
+
+		# If images exist 
+		if images:
+			# Delete the previous product image relation
+			Image.objects.filter(product=instance).delete()
+
+			# Creat the relation again.
+			for image in images:
+				try:
+					Image.objects.create(product=instance, image=image)
+				except Exception as e:
+					raise serializers.ValidationError(f"Unable to create image: {e}")
+				
+		return instance
+				
 	
 	def to_representation(self, instance):
 		# When calling .data attribute only return the id of the instance created/updated
