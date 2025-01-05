@@ -381,6 +381,13 @@ def manage_products(request, id):
 	
 	# Logic for Updating product
 	if request.method == "PATCH":
+		
+		# Check if request data is empty
+		if not request.data:
+			return Response({
+				"field": "No update fields were specified."
+			}, status=status.HTTP_400_BAD_REQUEST)
+
 		# Serialize incoming data while bining it to the product and enabling partial update
 		serializer = CreateProductSerialzier(instance=product, data=request.data, partial=True)
 		# Check incoming data validity, if not return error
