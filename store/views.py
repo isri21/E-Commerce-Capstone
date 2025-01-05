@@ -269,6 +269,13 @@ def list_all_categories(request):
 	# Get all the categories
 	categories = Category.objects.filter(is_deleted=False)
 
+	# Check if the category queryset is not empty
+	if not categories.exists():
+		# If it is empty, return a 404 NOT FOUND
+		return Response({
+			"no_categories": "There are not categories in the store yet."
+		}, status=status.HTTP_204_NO_CONTENT)
+
 	# Paginate the queryset
 	paginated = paginator.paginate_queryset(categories, request)
 	# Serialize the categories
