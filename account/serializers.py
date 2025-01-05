@@ -26,7 +26,7 @@ class ProfilePurchasesSerialzier(serializers.ModelSerializer):
 	purchase_id = serializers.IntegerField(source="id")
 	product = serializers.CharField(source="product.name")
 	purchase_price = serializers.IntegerField(source="price")
-	purchase_date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+	purchase_date = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
 	class Meta:
 		model = Purchase
 		fields = ["purchase_id", "product", "discount", "purchase_price", "quantity", "purchase_date"]

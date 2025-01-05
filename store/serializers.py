@@ -40,7 +40,7 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 # Serializer for detail view of specific products
 class ViewDetailProdcutSerializer(serializers.ModelSerializer):
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
-	posted_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", source="created_at") # Change the name of the created_date field to posted_at
+	posted_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", source="created_at") # Change the name of the created_date field to posted_at
 	images = ImageSerializer(many=True) 
 	category = CategorySerializer(many=True)
 	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
@@ -118,8 +118,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 	# Display the actual name of the product, instead of it's id
 	product = serializers.CharField(source="product.name", read_only=True)
 	# Format the dates
-	review_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-	edited_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+	review_date = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
+	edited_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
 	review_id = serializers.CharField(source="id", read_only=True)
 	class Meta:
 		model = Review
@@ -169,8 +169,8 @@ class RatingSerializer(serializers.ModelSerializer):
 	# Display the actual name of the product, instead of it's id
 	product = serializers.CharField(source="product.name", read_only=True)
 	# Format the dates 
-	rating_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-	edited_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+	rating_date = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
+	edited_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
 	class Meta:
 		model = Rating
 		fields = ["id", "user", "product", "rating", "rating_date", "edited_at"]
@@ -278,7 +278,7 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 # Serializer for creating a product
 class CreateProductSerialzier(serializers.ModelSerializer):
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
-	posted_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", source="created_at", read_only=True) # Change the name of the created_date field to posted_at
+	posted_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", source="created_at", read_only=True) # Change the name of the created_date field to posted_at
 	images = serializers.ListField(child=serializers.ImageField()) # Use a list field since the image will be sent as a list
 	category = serializers.ListField(child=serializers.CharField(), write_only=True) # Use a list field since the categories will be sent as a list
 	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
@@ -327,6 +327,7 @@ class CreateProductSerialzier(serializers.ModelSerializer):
 		return value
 
 	def create(self, validated_data):
+		print(validated_data)
 		# Extract and remove images and category from validated data
 		images = validated_data.pop("images")
 		category = validated_data.pop("category")
