@@ -103,10 +103,26 @@ def list_product_view(request):
 	# Reutrn the serialized quieryset along with addtional information (meta-data)
 	return paginator.get_paginated_response(serializer.data)
 
-# View for getting a products details
+# View for getting a products details or purchasing a product.
 @api_view(["GET", "POST"])
 def detail_product_view(request, id):
-	# LOGIC for POST method
+	# Try to get the specific product, else return an error if it doesn't exist
+	try:
+		product = Product.objects.get(id=id)
+	except:
+		return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Check if product is marked deleted, if it is, return a not found
+	if product.is_deleted == True:
+		return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+	# Logic for getting a product details
+	if request.method == "GET":
+		# If product exists, serialize it and return serialized data along with a 200 OK
+		serializer = ViewDetailProdcutSerializer(product)
+		return Response(serializer.data, status=status.HTTP_200_OK)
+	
+	# Logic for purchasing a product
 	if request.method == "POST":
 		permission = IsAuthenticated() # Instantiate an IsAuthenticated permission
 		# Check if the use doesn't have the permission, if not return an error
@@ -114,16 +130,6 @@ def detail_product_view(request, id):
 			return Response({
 				"authentication_error": "You must be authenticated in order to purchase a product, please send you authentication token in the request header."
 			}, status=status.HTTP_401_UNAUTHORIZED)
-		
-		# Try to get the specific product, else return an error if it doesn't exist
-		try:
-			product = Product.objects.get(id=id)
-		except:
-			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
-		
-		# Check if product is marked deleted, if it is, return a not found
-		if product.is_deleted == True:
-			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 		
 		# Serialize the incoming, data (quantity to purchase)
 		serializer = PurchaseSerializer(
@@ -137,23 +143,7 @@ def detail_product_view(request, id):
 		if serializer.is_valid(raise_exception=True):
 			serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-	# LOGIC for GET method
-	if request.method == "GET":
-		# Try to get the specifc product, if not exist, return an error
-		try:
-			product = Product.objects.get(id=id)
-		except:
-			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
-		
-		# Check if product is deleted, if it is, return a not found
-		if product.is_deleted == True:
-			return Response({"not_found": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 	
-	# If product exists, serialize it and return serialized data along with a 200 OK
-	serializer = ViewDetailProdcutSerializer(product)
-	return Response(serializer.data, status=status.HTTP_200_OK)
-
 # View for adding a product to a wishlist
 @api_view(["POST"])
 def wishlist_product(request, id):
