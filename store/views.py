@@ -215,12 +215,6 @@ def review_product(request, id):
 	if product.is_deleted == True:
 		return Response({"error": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
-	# Check if the data sent is a text/string
-	if not isinstance(request.data.get("review"), str):
-		return Response({
-			"error": "The review must be a string value."
-		}, status=status.HTTP_400_BAD_REQUEST)
-	
 	# Check if the user has purchased the product to review
 	purchased = Purchase.objects.filter(product=product, user=user)
 	if not purchased.exists():
