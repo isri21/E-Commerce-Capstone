@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models import Count, Case, When, F, Sum, DecimalField
+from django.db.models import Count
 from django.apps import apps
 
 class User(AbstractUser):

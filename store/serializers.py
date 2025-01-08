@@ -222,9 +222,10 @@ class RatingSerializer(serializers.ModelSerializer):
 			
 class DetailCategorySerializer(serializers.ModelSerializer):
 	creator = serializers.CharField(source="creator.username", read_only=True)
+	products_in_category = serializers.IntegerField(source="no_products", read_only=True)
 	class Meta:
 		model = Category
-		fields = ["id", "creator", "name"]
+		fields = ["id", "creator", "name", "products_in_category"]
 		read_only_fields = ["id"]
 
 	# Custom created method

@@ -24,8 +24,8 @@ class Category(models.Model):
 	
 	@property
 	def no_products(self):
-		products = Product_Category.objects.filter(category__name=self.name).aggregate(no=Count("id"))
-		return products
+		products = Product_Category.objects.filter(category__name=self.name).aggregate(product_no=Count("id"))
+		return products["product_no"]
 	
 
 # Product Model
