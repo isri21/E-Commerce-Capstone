@@ -8,36 +8,36 @@ class User(AbstractUser):
 	def products_purchased(self):
 		Purchase = apps.get_model("store", "Purchase")
 		total_purchase = Purchase.objects.filter(user=self.id).aggregate(purchase_num=Count("user"))
-		return total_purchase
+		return total_purchase["purchase_num"]
 
 	@property
 	def products_reviewed(self):
 		Review = apps.get_model("account", "Review")
 		total_review = Review.objects.filter(user=self.id).aggregate(review_num=Count("user"))
-		return total_review
+		return total_review["review_num"]
 	@property
 	def products_rated(self):
 		Rating = apps.get_model("account", "Rating")
 		total_rating = Rating.objects.filter(user=self.id).aggregate(rating_num=Count("user"))
-		return total_rating
+		return total_rating["rating_num"]
 
 	@property
 	def products_posted(self):
 		Product = apps.get_model("store", "Product")
 		total_posted = Product.objects.filter(owner=self.id, is_deleted=False).aggregate(post_num=Count("owner"))
-		return total_posted
+		return total_posted["post_num"]
 
 	@property
 	def products_in_wishlist(self):
 		Wishlist = apps.get_model("account", "Wishlist")
 		total_wishlist = Wishlist.objects.filter(user=self.id).aggregate(wish_list=Count("user"))
-		return total_wishlist
+		return total_wishlist["wish_list"]
 
 	@property
 	def categories_created(self):
 		Category = apps.get_model("store", "Category")
 		total_categories = Category.objects.filter(creator=self.id).aggregate(category_count=Count("creator"))
-		return total_categories
+		return total_categories["category_count"]
 
 	@property
 	def money_spent(self):

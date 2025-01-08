@@ -34,13 +34,13 @@ def profile_info(request):
 			}, status=status.HTTP_400_BAD_REQUEST)
 
 		# Instantiate serializer, while binding it to the user object and allowing partial fields
-		serialized = ProfileSerializer(instance=user, data=request.data, partial=True)
+		serialized = ProfileSerializer(instance=user, data=request.data, partial=True, context={"only_profile": True})
 		if serialized.is_valid(raise_exception=True): # Check if the data sent is valid
 			# If data is valid, save it and return the serialized data, along with a success message
 			serialized.save()
 			return Response({
 				"status": f"Update succesfull.",
-				"updated": serialized.data
+				"updated_profile": serialized.data
 			}, status=status.HTTP_200_OK)
 		
 
