@@ -248,7 +248,7 @@ def manage_reviews(request, id):
 	# Logic for updating a review
 	if request.method == "PATCH":
 		# Serialize the incoming data, the review
-		serializer = ReviewSerializer(instance=review, data=request.data, context={"include_user": False})
+		serializer = ReviewSerializer(instance=review, data=request.data, context={"include_user": True})
 		# Check if data is valid and send error if not.
 		if serializer.is_valid(raise_exception=True):
 			serializer.save()
