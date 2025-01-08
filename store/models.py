@@ -53,35 +53,51 @@ class Product(models.Model):
 	def no_of_ratings(self):
 		Rating = apps.get_model("account", "Rating")
 		total_ratings = Rating.objects.filter(product=self.id).aggregate(total_rates=Count("rating"))
-		return total_ratings["total_rates"]
+		if total_ratings["total_rates"]:
+			rating = total_ratings["total_rates"]
+		else:
+			rating = 0
+		return float(rating)
 
 	@property
 	def no_of_reviews(self):
 		Review = apps.get_model("account", "Review")
 		total_reviews = Review.objects.filter(product=self.id).aggregate(total_review=Count("review"))
-		return total_reviews["total_review"]
+		if total_reviews["total_review"]:
+			reviews = total_reviews["total_review"]
+		else:
+			reviews = 0
+		return float(reviews)
 
 	@property
 	def avg_rating(self):
 		Rating = apps.get_model("account", "Rating")
 
 		avg_ratings = Rating.objects.filter(product=self.id).aggregate(avg_rates=Avg("rating"))
-		return avg_ratings["avg_rates"]
+		if avg_ratings["avg_rates"]:
+			average = avg_ratings["avg_rates"]
+		else:
+			average = 0
+		return float(average)
 
 	@property
 	def total_items_sold(self):
 		total_sold = Purchase.objects.filter(product=self.id).aggregate(total_sell=Sum("quantity"))
-		return total_sold["total_sell"]
+		if total_sold["total_sell"]:
+			total = total_sold["total_sell"]
+		else:
+			total = 0
+		return float(total)
 
 	@property
 	def profit_made(self):
-		# Usinf F object to calculate total price and then aggregating the sum of the total prices
-		profit_made = Purchase.objects.filter(product=self.id).annotate(total_price=Case(
-			When(discount__exact=0, then=F("price") * F("quantity")), # If the discount is 0, then just multiply price and quantity
-			default=(F("discount")/100) * F("price") * F("quantity"), # Else divide discount by 100 and then multiply by price and quantity
-			output_field=DecimalField()
-		)).aggregate(total_profit=Sum("total_price"))
-		return profit_made["total_profit"]
+		Purchase = apps.get_model("store", "Purchase")
+		purchases =  Purchase.objects.filter(product=self.id)
+		total_profit = 0
+		for purchase in purchases:
+			total_profit += purchase.total_price
+
+		return total_profit
 	
 	def __str__(self):
 		return self.name

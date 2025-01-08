@@ -34,31 +34,60 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 	category = CategorySerializer(many=True)
 	class Meta:
 		model = Product
-		fields = ["id",	"name", "images", "category", "stock_quantity"]
+		fields = ["id",	"name", "images", "category", "stock_quantity", ]
 
 
 # Serializer for detail view of specific products
 class ViewDetailProdcutSerializer(serializers.ModelSerializer):
+	owner = serializers.CharField(source="owner.username")
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
 	posted_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", source="created_at") # Change the name of the created_date field to posted_at
 	images = ImageSerializer(many=True) 
 	category = CategorySerializer(many=True)
 	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
+	rating = serializers.FloatField(source="avg_rating")
 	class Meta:
 		model = Product
 		fields = [
-			"id",
-			"owner",
-			"name",
-			"description",
-			"original_price",
-			"discount_percent",
-			"final_price",
-			"stock_quantity",
-			"category",
-			"images",
-			"posted_at",
+			"id", "owner", "name", "description", "original_price", "discount_percent",
+			"final_price", "stock_quantity", "category", "images", "posted_at",
+			"no_of_ratings", "rating", "no_of_reviews", "total_items_sold"
 		]
+
+	def to_representation(self, instance):
+		only_product = self.context.get("only_product", False)
+		data = super().to_representation(instance)
+		product_details = {}
+		product_stats = {}
+
+		# Move fields realted to product details to product_detials dict
+		product_details["id"] = data.pop("id")
+		product_details["owner"] = data.pop("owner")
+		product_details["name"] = data.pop("name")
+		product_details["description"] = data.pop("description")
+		product_details["original_price"] = data.pop("original_price")
+		product_details["discount_percent"] = data.pop("discount_percent")
+		product_details["final_price"] = data.pop("final_price")
+		product_details["stock_quantity"] = data.pop("stock_quantity")
+		product_details["category"] = data.pop("category")
+		product_details["images"] = data.pop("images")
+		product_details["posted_at"] = data.pop("posted_at")
+
+		data["product_details"] = product_details
+
+		if only_product == False:
+			# Move statistic data to product_stats dict
+			product_stats["no_of_ratings"] = data.pop("no_of_ratings")
+			product_stats["rating"] = data.pop("rating")
+			product_stats["no_of_reviews"] = data.pop("no_of_reviews")
+			product_stats["total_items_sold"] = data.pop("total_items_sold")
+
+			data["product_stats"] = product_stats
+			return data
+	
+		return data["product_details"]
+
+
 
 # Serializer for purchasing products
 class PurchaseSerializer(serializers.ModelSerializer):

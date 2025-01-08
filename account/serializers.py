@@ -22,7 +22,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 	def to_representation(self, instance):
 		only_profile = self.context.get("only_profile", False)
-		print(self.context)
 		data =  super().to_representation(instance)
 		profile_details = {}
 		financial_details = {}
@@ -31,7 +30,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 		profile_details["first_name"] = data.pop("first_name")
 		profile_details["last_name"] = data.pop("last_name")
 		profile_details["email"] = data.pop("email")
+		
 		data["profile_details"] = profile_details
+
 		if only_profile == False:
 			financial_details["money_spent"] = str(data.pop("money_spent")) + " ETB"
 			financial_details["money_earned"] = str(data.pop("money_earned")) + " ETB"

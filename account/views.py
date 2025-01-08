@@ -352,7 +352,7 @@ def list_create_products(request):
 			serializer.save(owner=user) # Save the product if valid
 			id = serializer.data["id"] # Get the prodcut id of saved product
 			new_product = Product.objects.get(id=id) # Get the saved prodcut form the model
-			new_serializer = ViewDetailProdcutSerializer(new_product) # Serialize the new product
+			new_serializer = ViewDetailProdcutSerializer(new_product, context={"only_product": True}) # Serialize the new product
 			return Response({
 				"status": "Successfully Created a New Product",
 				"product": new_serializer.data # Return the new product details
@@ -395,7 +395,7 @@ def manage_products(request, id):
 			serializer.save(owner=user) # Save the product if valid
 			id = serializer.data["id"] # Get the prodcut id of saved product
 			new_product = Product.objects.get(id=id) # Get the saved prodcut form the model
-			new_serializer = ViewDetailProdcutSerializer(new_product) # Serialize the new product
+			new_serializer = ViewDetailProdcutSerializer(new_product, context={"only_product": True}) # Serialize the new product
 			return Response({
 				"status": "Successfully Updated the Product",
 				"product": new_serializer.data # Return the new product details

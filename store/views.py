@@ -119,7 +119,7 @@ def detail_product_view(request, id):
 	# Logic for getting a product details
 	if request.method == "GET":
 		# If product exists, serialize it and return serialized data along with a 200 OK
-		serializer = ViewDetailProdcutSerializer(product)
+		serializer = ViewDetailProdcutSerializer(product, context={"user": request.user})
 		return Response(serializer.data, status=status.HTTP_200_OK)
 	
 	# Logic for purchasing a product
