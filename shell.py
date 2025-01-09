@@ -7,6 +7,6 @@ from authenticate.models import User
 from store.models import Purchase
 from django.db.models import Count, Case, When, F, Sum, DecimalField
 from django.db.models.functions import Cast
-user = User.objects.get(username="root")
-print(user.money_spent)
-print(user.money_earned)
+import os
+print(os.getenv("SECRET_KEY"))
+print(os.getenv("DEBUG"))
