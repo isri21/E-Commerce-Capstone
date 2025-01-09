@@ -247,7 +247,7 @@ def manage_reviews(request, id):
 		}, status=status.HTTP_401_UNAUTHORIZED)
 
 	# Logic for updating a review
-	if request.method == "PATCH":
+	if request.method == "PUT":
 		# Serialize the incoming data, the review
 		serializer = ReviewSerializer(instance=review, data=request.data)
 		# Check if data is valid and send error if not.
@@ -306,7 +306,7 @@ def manage_ratings(request, id):
 		}, status=status.HTTP_401_UNAUTHORIZED)
 
 	# Logic for updating a rating
-	if request.method == "PATCH":
+	if request.method == "PUT":
 		# Serialize the incoming data, the rating
 		serializer = RatingSerializer(instance=rating, data=request.data)
 		# Check if data is valid and send error if not.

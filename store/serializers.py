@@ -198,10 +198,22 @@ class RatingSerializer(serializers.ModelSerializer):
 	# Format the dates and time to YY-MM-DD HH-MM-SS (AM/PM)
 	rating_date = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
 	edited_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
+	rating = serializers.DecimalField(max_digits=3, decimal_places=1, error_messages={
+		"max_digits": "Rating can only contain 3 digits.",
+		'max_decimal_places': 'Only 1 decimal place is allowed.',
+        'max_whole_digits': 'Only 2 whole digit are allowed.',
+	})
 	class Meta:
 		model = Rating
 		fields = ["id", "product", "rating", "rating_date", "edited_at"]
 		read_only_fields = ["id"]
+
+	# Check if the rating entered is negative
+	def validate_rating(self, value):
+		if value < 0 or value > 10:
+			raise serializers.ValidationError("Rating can only be between 1 and 10.")
+		
+		return value
 
 	# Create custom create method
 	def create(self, validated_data):
