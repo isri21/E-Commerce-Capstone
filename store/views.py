@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.decorators import api_view
 from .serializers import *
 from rest_framework.response import Response
@@ -9,41 +8,35 @@ from rest_framework.permissions import IsAuthenticated
 from account.models import *
 from django.db import IntegrityError
 
-# View for getting all the proucts in the store
+# Handle getting all the products in the store that are not deleted
 @api_view(["GET"])
 def list_product_view(request):
-	# instantiate the custom paginator
+	# Prepare paginator
 	paginator = CustomPagination()
 
-	# fetch all the products using prefetch_related for optimization, and only show product that are not marked deleted
+	# Get all the products that are not deleted
 	products = Product.objects.prefetch_related("category").filter(is_deleted=False)
 
-	# get the query parameters
+	# Prepare the query parameters
 	search = request.GET.get("search", None)
 	category = request.GET.get("category", None)
 	in_stock = request.GET.get("in_stock", None)
 	min_price = request.GET.get("min_price", None)
 	max_price = request.GET.get("max_price", None)
 
-	# Check if there is an invalid query parameter
+	# Check if the user entered an invalid query parameter, and respond accordingly
 	for key in request.GET:
 		if key not in ["search", "category", "in_stock", "min_price", "max_price", "page", "per_page"]:
 			return Response({f"{key}": "Invalid query parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-	# Check if the search query parameter is specified
+	# Check if the query parameters are entered by the user and filter the queryset accordngly
 	if search:
-		# filter the queryset based on the search parameter
 		products = products.filter(Q(name__icontains=search) | Q(category__name__icontains=search))
 
-	# Check if the category query parameter is specified
 	if category:
-		# filter the queryset based on the category parameter
 		products = products.filter(category__name__icontains=category)
 	
-	# Check if the category query parameter is specified
 	if in_stock:
-		# Check if the value for the parameter is "yes" or "no" and filter accordingly
 		if in_stock.lower() == "yes":
 			products = products.filter(stock_quantity__gt=0)
 		elif in_stock.lower() == "no":
@@ -59,7 +52,7 @@ def list_product_view(request):
 			min_price = float(min_price)
 			max_price = float(max_price)
 		except ValueError:
-			# It the values of "min_price" and "max_price" can't be converted to float return an error
+			# If the values of "min_price" and "max_price" can't be converted to float return an error
 			return Response({"range_error": "Both the min_price and max_price filters must be numbers."}, status=status.HTTP_400_BAD_REQUEST)
 		
 		# Check if "min_price" is greater than "max_price"
@@ -89,9 +82,8 @@ def list_product_view(request):
 		# If it is a vaid value filter the queryset by the "max_price" parameter
 		products = products.filter(price__lte=max_price)
 
-	# Check if the product queryset is not empty
+	# Check if the filtered product queryset is not empty, if it is empty respond accordingly
 	if not products.exists():
-		# If it is empty, return a 404 NOT FOUND
 		return Response({"not_found": "There are no items that match your filters."}, status=status.HTTP_404_NOT_FOUND)
 
 	# Paginate the queryset
@@ -103,7 +95,7 @@ def list_product_view(request):
 	# Reutrn the serialized quieryset along with addtional information (meta-data)
 	return paginator.get_paginated_response(serializer.data)
 
-# View for getting a products details or purchasing a product.
+# Handle getting a specific product and purchasing a product
 @api_view(["GET", "POST"])
 def detail_product_view(request, id):
 	# Try to get the specific product, else return an error if it doesn't exist
@@ -119,13 +111,15 @@ def detail_product_view(request, id):
 	# Logic for getting a product details
 	if request.method == "GET":
 		# If product exists, serialize it and return serialized data along with a 200 OK
-		serializer = ViewDetailProdcutSerializer(product, context={"user": request.user})
+		serializer = ViewDetailProdcutSerializer(product)
 		return Response(serializer.data, status=status.HTTP_200_OK)
 	
 	# Logic for purchasing a product
 	if request.method == "POST":
-		permission = IsAuthenticated() # Instantiate an IsAuthenticated permission
-		# Check if the use doesn't have the permission, if not return an error
+		# Prepare the IsAuthenticated permission
+		permission = IsAuthenticated()
+
+		# Check if the user doesn't have the permission, if they don't respond accordingly
 		if not permission.has_permission(request, None):
 			return Response({
 				"authentication_error": "You must be authenticated in order to purchase a product, please send you authentication token in the request header."
@@ -144,11 +138,13 @@ def detail_product_view(request, id):
 			serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 	
-# View for adding a product to a wishlist
+# Handle adding a product to wishlist
 @api_view(["POST"])
 def wishlist_product(request, id):
-	permission = IsAuthenticated() # Instantiate an IsAuthenticated permisison
-	# Check if the user doesn't have the permisison, if not retrun an error
+	# Instantiate an IsAuthenticated permisison
+	permission = IsAuthenticated()
+
+	# Check if the user doesn't have the permisison, if they don't respond accordingly
 	if not permission.has_permission(request, None):
 		return Response({
 			"error": "You must be authenticated in order to purchase a product, please send you authentication token in the request header."
@@ -180,11 +176,13 @@ def wishlist_product(request, id):
 			"error": "You have already added this product to your wish list."
 		}, status=status.HTTP_409_CONFLICT)
 	
-
+# Handle reviewing a product
 @api_view(["POST"])
 def review_product(request, id):
-	permission = IsAuthenticated() # Instantiate an IsAuthenticated permisison
-	# Check if the user doesn't have the permisison, if not retrun an error
+	# Instantiate an IsAuthenticated permisison
+	permission = IsAuthenticated()
+
+	# Check if the user doesn't have the permisison, if they don't respond accordingly
 	if not permission.has_permission(request, None):
 		return Response({
 			"error": "You must be authenticated in order to add a product to your wish list, please send you authentication token in the request header."
@@ -205,25 +203,59 @@ def review_product(request, id):
 	if product.is_deleted == True:
 		return Response({"error": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
-	# Check if the user has purchased the product to review
+	# Check if the user has purchased the product to review, if they havent respond accordingly
 	purchased = Purchase.objects.filter(product=product, user=user)
 	if not purchased.exists():
 		return Response({
 			"error": "In order to review a product, you must first purchase it."
 		}, status=status.HTTP_403_FORBIDDEN)
 	
+	# Deserialized the incoming data (the review)
 	serializer = ReviewSerializer(data=request.data)
+
+	# Check if the incoming data is valid, and respond accordingly
 	if serializer.is_valid(raise_exception=True):
+		# Pass the user object and the prodcut reviewed when saving,  to create the review instance
 		serializer.save(user=user, product=product)
 		return Response({
 			"status": "You have successfully reviewed the product."
 		}, status=status.HTTP_201_CREATED)
 
-# View to rate a product	
+# Handle getting the reviews for a product
+@api_view(["GET"])
+def list_product_reviews(request, id):
+
+	# Try to get the specific product, else return an error if it doesn't exist
+	try:
+		product = Product.objects.get(id=id)
+	except:
+		return Response({
+			"error": "Product does not exist."
+		}, status=status.HTTP_404_NOT_FOUND)
+	
+	# Get reviews, and check if they are empty, if they are respond accordingly
+	reviews = Review.objects.filter(product=product)
+	if not reviews.exists():
+		return Response({
+			"no_reviews": "There are no reviews for this product",
+		}, status=status.HTTP_204_NO_CONTENT)
+	
+	# Prepare Paginator and paginate the queryset
+	paginator = BasicPagination()
+	paginated = paginator.paginate_queryset(reviews, request)
+
+	# Serialize paginated reviews
+	serializer = ReviewSerializer(paginated, many=True)
+
+	return paginator.get_paginated_response(serializer.data)
+
+# Handle rating a product	
 @api_view(["POST"])
 def rate_product(request, id):
-	permission = IsAuthenticated() # Instantiate an IsAuthenticated permisison
-	# Check if the user doesn't have the permisison, if not retrun an error
+	# Instantiate an IsAuthenticated permisison
+	permission = IsAuthenticated()
+
+	# Check if the user doesn't have the permisison, if they don't respond accordingly
 	if not permission.has_permission(request, None):
 		return Response({
 			"error": "You must be authenticated in order to rate this product, please send you authentication token in the request header."
@@ -244,69 +276,43 @@ def rate_product(request, id):
 	if product.is_deleted == True:
 		return Response({"error": "Product does not exist."}, status=status.HTTP_404_NOT_FOUND)
 	
-	# Check if the user has purchased the product to rate
+	# Check if the user has purchased the product to rate, if they havent respond accordingly
 	purchased = Purchase.objects.filter(product=product, user=user)
 	if not purchased.exists():
 		return Response({
 			"error": "In order to rate a product, you must first purchase it."
 		}, status=status.HTTP_403_FORBIDDEN)
 	
-	serializer = RatingSerializer(data=request.data) # Serialize the incoming data
-	if serializer.is_valid(raise_exception=True): # Check if incoming data is valid.
-		# If data valid, pass the user and product object to the serializer and save it. 
+	# Deserialize the incoming data (the rating)
+	serializer = RatingSerializer(data=request.data)
+	# Check if incoming data is valid, and respond accordingly
+	if serializer.is_valid(raise_exception=True):
+		# Pass the user object and the prodcut reviewd to create the review instance 
 		serializer.save(user=user, product=product)
-		# Return success message
 		return Response({
 			"status": "You have successfully rated the product."
 		}, status=status.HTTP_201_CREATED)
 	
-# View to list all the categories available	
+# Handle getting all the categories created	
 @api_view(["GET"])
 def list_all_categories(request):
-	# instantiate the custom paginator
+	# Prepare a paginator
 	paginator = BasicPagination()
 
-	# Get all the categories
+	# Get all the categories that are not deleted
 	categories = Category.objects.filter(is_deleted=False)
 
-	# Check if the category queryset is not empty
+	# Check if the category queryset is not empty, if it is respond accordingly
 	if not categories.exists():
-		# If it is empty, return a 404 NOT FOUND
 		return Response({
 			"no_categories": "There are not categories in the store yet."
 		}, status=status.HTTP_204_NO_CONTENT)
 
 	# Paginate the queryset
 	paginated = paginator.paginate_queryset(categories, request)
-	# Serialize the categories
+
+	# Serialize the paginated queryset
 	serializer = DetailCategorySerializer(paginated, many=True)
 
 	# Return serialized data, and status of 200
-	return paginator.get_paginated_response(serializer.data)
-
-# View to list all reviews for a product
-@api_view(["GET"])
-def list_product_reviews(request, id):
-	# Try to get the specific product, else return an error if it doesn't exist
-	try:
-		product = Product.objects.get(id=id)
-	except:
-		return Response({
-			"error": "Product does not exist."
-		}, status=status.HTTP_404_NOT_FOUND)
-	
-	# Get reviews, and check if they are empty
-	reviews = Review.objects.filter(product=product)
-	if not reviews.exists():
-		return Response({
-			"no_reviews": "There are no reviews for this product",
-		}, status=status.HTTP_204_NO_CONTENT)
-	
-	# Paginate
-	paginator = BasicPagination()
-	paginated = paginator.paginate_queryset(reviews, request)
-
-	# Serialize paginated reviews
-	serializer = ReviewSerializer(paginated, many=True)
-
 	return paginator.get_paginated_response(serializer.data)

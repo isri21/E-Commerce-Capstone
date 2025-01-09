@@ -223,7 +223,7 @@ def list_reviews(request):
 	paginated = paginator.paginate_queryset(reviews, request)
 
 	# Serialize the paginated queryset
-	serializer = ReviewSerializer(paginated, many=True, context={"include_user": False})
+	serializer = ReviewSerializer(paginated, many=True, context={"remove_user": True})
 	# return the data
 	return paginator.get_paginated_response(serializer.data)
 
@@ -248,7 +248,7 @@ def manage_reviews(request, id):
 	# Logic for updating a review
 	if request.method == "PATCH":
 		# Serialize the incoming data, the review
-		serializer = ReviewSerializer(instance=review, data=request.data, context={"include_user": True})
+		serializer = ReviewSerializer(instance=review, data=request.data)
 		# Check if data is valid and send error if not.
 		if serializer.is_valid(raise_exception=True):
 			serializer.save()
@@ -282,7 +282,7 @@ def list_ratings(request):
 	paginated = paginator.paginate_queryset(ratings, request)
 
 	# Serialize the paginated queryset
-	serializer = RatingSerializer(paginated, many=True, context={"include_user": False})
+	serializer = RatingSerializer(paginated, many=True)
 	# return the data
 	return paginator.get_paginated_response(serializer.data)
 
@@ -307,7 +307,7 @@ def manage_ratings(request, id):
 	# Logic for updating a rating
 	if request.method == "PATCH":
 		# Serialize the incoming data, the rating
-		serializer = RatingSerializer(instance=rating, data=request.data, context={"include_user": False})
+		serializer = RatingSerializer(instance=rating, data=request.data)
 		# Check if data is valid and send error if not.
 		if serializer.is_valid(raise_exception=True):
 			serializer.save()

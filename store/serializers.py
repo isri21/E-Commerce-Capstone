@@ -22,11 +22,10 @@ class CategorySerializer(serializers.ModelSerializer):
 		model = Category
 		fields = ["name"] # Only include the name field of the model
 
-	# On deserialization return only the image url as a string, not the image object.
+	# On deserialization return only the category name as a string, not the category object.
 	def to_representation(self, instance):
 		data = super().to_representation(instance)
 		return data["name"]
-
 
 # Serializer for the list view of all the products
 class GeneralProductsSerializer(serializers.ModelSerializer):
@@ -36,16 +35,15 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 		model = Product
 		fields = ["id",	"name", "images", "category", "stock_quantity", ]
 
-
 # Serializer for detail view of specific products
 class ViewDetailProdcutSerializer(serializers.ModelSerializer):
-	owner = serializers.CharField(source="owner.username")
+	owner = serializers.CharField(source="owner.username") # Get the actual name of the user instead of the id
 	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
 	posted_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", source="created_at") # Change the name of the created_date field to posted_at
 	images = ImageSerializer(many=True) 
 	category = CategorySerializer(many=True)
 	discount_percent = serializers.IntegerField(source="discount") # Change the name of the discount field to discount_percent
-	rating = serializers.FloatField(source="avg_rating")
+	rating = serializers.FloatField(source="avg_rating") # Change the name of the avg_rating field to rating
 	class Meta:
 		model = Product
 		fields = [
@@ -54,12 +52,15 @@ class ViewDetailProdcutSerializer(serializers.ModelSerializer):
 			"no_of_ratings", "rating", "no_of_reviews", "total_items_sold"
 		]
 
+	# Custom structure of the output data
 	def to_representation(self, instance):
+		# Check if the only_product key is passed as a conted, this will be passed when using serializer for updating data
 		only_product = self.context.get("only_product", False)
+		# Call the main to_representation method
 		data = super().to_representation(instance)
+		# Prepare a product_details dict for grouping fields reltaed to the product
 		product_details = {}
-		product_stats = {}
-
+		
 		# Move fields realted to product details to product_detials dict
 		product_details["id"] = data.pop("id")
 		product_details["owner"] = data.pop("owner")
@@ -73,41 +74,44 @@ class ViewDetailProdcutSerializer(serializers.ModelSerializer):
 		product_details["images"] = data.pop("images")
 		product_details["posted_at"] = data.pop("posted_at")
 
+		# Add the product_detials dict to the output data dict
 		data["product_details"] = product_details
 
+		# Check if the only_product key is False, meaning it was not specified
 		if only_product == False:
+			# Prepare a product_stats dict for grouping fields reltaed to the product stats
+			product_stats = {}
 			# Move statistic data to product_stats dict
 			product_stats["no_of_ratings"] = data.pop("no_of_ratings")
 			product_stats["rating"] = data.pop("rating")
 			product_stats["no_of_reviews"] = data.pop("no_of_reviews")
 			product_stats["total_items_sold"] = data.pop("total_items_sold")
 
+			# Add the product_stats dict to the output data dict
 			data["product_stats"] = product_stats
+
+			# Return the entire output data dict
 			return data
 	
+		# Return only the product_details (when serializer used for update)
 		return data["product_details"]
-
-
 
 # Serializer for purchasing products
 class PurchaseSerializer(serializers.ModelSerializer):
-	# Display the actual name of the user, insted of it's id
-	user = serializers.CharField(source="user.username", read_only=True)
-	# Display the actual name fo the product, instead of it's id
-	product = serializers.CharField(source="product.name", read_only=True)
+	user = serializers.CharField(source="user.username", read_only=True) # Display the actual name of the user, insted of it's id
+	product = serializers.CharField(source="product.name", read_only=True) # Display the actual name fo the product, instead of it's id
 	# Use the final price derived from the discount and original_price and name the field "purchase_price"
 	purchase_price = serializers.DecimalField(source="price", max_digits=6, decimal_places=2, read_only=True)
-	# Format the data time field as YYYY-MM-DD HH-MM-SS
-	purchase_date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+	purchase_date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True) # Format the data time field as YYYY-MM-DD HH-MM-SS
 	
 	class Meta:
 		model = Purchase
 		fields = ["user", "product", "purchase_price", "discount", "quantity", "purchase_date"]
-		read_only_fields = ["user", "product", "purchase_price", "discount", "purchase_date"]
+		read_only_fields = ["discount"]
 
 	# Validate the quantity that the user entered
 	def validate_quantity(self, value):
-		product = self.context["product"] # Get the product form the context passed during serializer instantiation
+		product = self.context["product"] # Get the product from the context passed during serializer instantiation
 		if value <= 0: # Check if quantity is not greater than 0
 			raise serializers.ValidationError("Purchase amount must be greater than 0.")
 		if value > product.stock_quantity: # Check if the quantity enetered is not greater than the avalable stock of the prodcut
@@ -116,8 +120,10 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
 	# Custom create method for purchase
 	def create(self, validated_data):
-		user = self.context["request"].user # Get the user from the context provided during serializer instantiation
-		product = self.context["product"] # Get the product form the context passed during serializer instantiation
+		# Get the user from the context provided during serializer instantiation
+		user = self.context["request"].user
+		# Get the product form the context passed during serializer instantiation
+		product = self.context["product"]
 
 		# Create the purchase, using the user, product, and quantity the user specified
 		purchase = Purchase.objects.create(
@@ -136,20 +142,21 @@ class PurchaseSerializer(serializers.ModelSerializer):
 	# Modify the presentaiton of data
 	def to_representation(self, instance):
 		data = super().to_representation(instance)
-		purchase_price = float(data["purchase_price"]) # Set a purchase price variable with a float value of the purchase price
-		data["purchase_price"] = purchase_price # Convert the purchase price into a float type
-		return {"message": "Purchase Successful", "purchase_info": data} # Return custom strucutre
+		# Convert the purchase price to a float type
+		purchase_price = float(data["purchase_price"])
+		data["purchase_price"] = purchase_price
+
+		return {"message": "Purchase Successful", "purchase_info": data}
 
 # Serializer for the review model
 class ReviewSerializer(serializers.ModelSerializer):
-	# Display the actual name of the user, instead of it's id
-	user = serializers.CharField(source="user.username", read_only=True)
-	# Display the actual name of the product, instead of it's id
-	product = serializers.CharField(source="product.name", read_only=True)
-	# Format the dates
+	user = serializers.CharField(source="user.username", read_only=True) # Display the actual name of the user, instead of it's id
+	product = serializers.CharField(source="product.name", read_only=True) # Display the actual name of the product, instead of it's id
+	# Format the dates and time to YY-MM-DD HH-MM-SS (AM/PM)
 	review_date = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
 	edited_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
 	review_id = serializers.CharField(source="id", read_only=True)
+
 	class Meta:
 		model = Review
 		fields = ["review_id", "user", "product", "review", "review_date", "edited_at"]
@@ -161,7 +168,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 			return Review.objects.create(**validated_data)
 		except IntegrityError:
 			res = serializers.ValidationError({"error": "You have already reviewed this product."})
-			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
+			# Specify custom status code for the validaiton error, instead of 404 do 409
+			res.status_code = status.HTTP_409_CONFLICT
 			raise res # raise the validation error with the custom exception.
 		
 	def update(self, instance, validated_data):
@@ -176,35 +184,24 @@ class ReviewSerializer(serializers.ModelSerializer):
 	
 	def to_representation(self, instance):
 		data =  super().to_representation(instance)
-
-		# Check if the include user context was passed
-		# If passed it will be sent ase {"include_user": False}
-		# If we it is False remove it from serializer.data, if it is not specified keep it
-		include_user = self.context.get("include_user", True)
-		include_id = self.context.get("include_id", True)
-		if not include_user:
+		# Check if remove_user variable was passed in the context, if it is remove user from output
+		# It is passed when serializer is used for getting handling reviews by user 
+		remove_user = self.context.get("remove_user", False)
+		if remove_user:
 			data.pop("user")
-		
-		if not include_id:
-			data.pop("id")
 
 		return data
 
-
-# Serializer for the review model
+# Serializer for the rating model
 class RatingSerializer(serializers.ModelSerializer):
-	# Display the actual name of the user, instead of it's id
-	user = serializers.CharField(source="user.username", read_only=True)
-	# Display the actual name of the product, instead of it's id
-	product = serializers.CharField(source="product.name", read_only=True)
-	# Format the dates 
+	product = serializers.CharField(source="product.name", read_only=True) # Display the actual name of the product, instead of it's id
+	# Format the dates and time to YY-MM-DD HH-MM-SS (AM/PM)
 	rating_date = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
 	edited_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", read_only=True)
 	class Meta:
 		model = Rating
-		fields = ["id", "user", "product", "rating", "rating_date", "edited_at"]
-		# Specify read only fields
-		read_only_fields = ["rating_date", "edited_at"]
+		fields = ["id", "product", "rating", "rating_date", "edited_at"]
+		read_only_fields = ["id"]
 
 	# Create custom create method
 	def create(self, validated_data):
@@ -218,7 +215,8 @@ class RatingSerializer(serializers.ModelSerializer):
 			# Check if the exception raised was a unique constraint error
 			if unique_constraint_error in str(e):
 				res = serializers.ValidationError({"error": "You have already rated this product."})
-				res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
+				# Specify custom status code for the validaiton error, instead of 404 do 409
+				res.status_code = status.HTTP_409_CONFLICT
 				raise res # raise the validation error with the custom exception.
 			else: # Else it must be a check constraint error
 				raise serializers.ValidationError({"rating": "Value must be between 1 and 10."})
@@ -232,26 +230,12 @@ class RatingSerializer(serializers.ModelSerializer):
 		instance.save()
 		
 		return instance
-	
-	def to_representation(self, instance):
-		data =  super().to_representation(instance)
-
-		# Check if the include user context was passed
-		# If passed it will be sent ase {"include_user": False}
-		# If we it is False remove it from serializer.data, if it is not specified keep it
-		include_user = self.context.get("include_user", True)
-		include_id = self.context.get("include_id", True)
-		if not include_user:
-			data.pop("user")
-		
-		if not include_id:
-			data.pop("id")
-
-		return data
 			
+# Serialier for categories model used for getting all the categories in store
 class DetailCategorySerializer(serializers.ModelSerializer):
-	creator = serializers.CharField(source="creator.username", read_only=True)
-	products_in_category = serializers.IntegerField(source="no_products", read_only=True)
+	creator = serializers.CharField(source="creator.username", read_only=True) # Use the actual name of the creator instead of an id
+	products_in_category = serializers.IntegerField(source="no_products", read_only=True) # Rename the no_products field
+	
 	class Meta:
 		model = Category
 		fields = ["id", "creator", "name", "products_in_category"]
@@ -262,16 +246,17 @@ class DetailCategorySerializer(serializers.ModelSerializer):
 		user = validated_data.pop("user") # get the user object passed during .save()
 		name = validated_data.get("name").lower() # convert the name sent in request to lower case
 
-		# Try to create the category object, if unable return error
-		# Reason converted to lower case is to check for duplicates, and since -
+		# Try to create the category object, if unable return error.
+		# Reason for converting to lower case is to check for duplicates, and since -
 		# there is unique constraint on the field if unable to create the category -
 		# the reason is duplicate names.
 		try:
 			category = Category.objects.create(creator=user, name=name)
 		except IntegrityError:
 			res = serializers.ValidationError({"name": "There already exists a category with this name."})
-			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
-			raise res # raise the validation error with the custom exception.
+			# Specify custom status code for the validaiton error, instead of return 400 return 409
+			res.status_code = status.HTTP_409_CONFLICT
+			raise res
 		return category
 	
 	def update(self, instance, validated_data):
@@ -285,8 +270,9 @@ class DetailCategorySerializer(serializers.ModelSerializer):
 			instance.save()
 		except IntegrityError:
 			res = serializers.ValidationError({"name": "There already exists a category with this name."})
-			res.status_code = status.HTTP_409_CONFLICT # Specify custom status code for the validaiton error
-			raise res # raise the validation error with the custom exception.
+			# Specify custom status code for the validaiton error, instead of return 400 return 409
+			res.status_code = status.HTTP_409_CONFLICT
+			raise res
 	
 		return instance
 	
@@ -304,10 +290,9 @@ class GeneralProductsSerializer(serializers.ModelSerializer):
 		model = Product
 		fields = ["id",	"name", "images", "category", "stock_quantity"]
 
-
 # Serializer for creating a product
 class CreateProductSerialzier(serializers.ModelSerializer):
-	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original price
+	original_price = serializers.IntegerField(source="price") # Change the name of the price field to original_price
 	posted_at = serializers.DateTimeField(format="%Y-%m-%d %I:%M:%S (%p)", source="created_at", read_only=True) # Change the name of the created_date field to posted_at
 	images = serializers.ListField(child=serializers.ImageField()) # Use a list field since the image will be sent as a list
 	category = serializers.ListField(child=serializers.CharField(), write_only=True) # Use a list field since the categories will be sent as a list
@@ -341,11 +326,12 @@ class CreateProductSerialzier(serializers.ModelSerializer):
 	# Check if the categories specifed all exist
 	def validate_category(self, value):
 		for category in value:
+			# Convert the category to lower, since that is how it is stored in the db
 			category_lower = category.lower()
+			# Try to get the category, if unable, respond accordingly
 			try:
 				Category.objects.get(name=category_lower)
 			except Category.DoesNotExist:
-				print(category)
 				raise serializers.ValidationError({f"{category}": "This category does not exist. If you want to use it, create it first."})
 		return value
 	
@@ -353,7 +339,8 @@ class CreateProductSerialzier(serializers.ModelSerializer):
 	def validate_images(self, value):
 		for image in value:
 			if image.content_type not in ["image/jpeg", "image/jpg", "image/png"]:
-				raise serializers.ValidationError(f"[{os.path.basename(image.name)}] is not a JPG, JPEG or PNG file.")
+				image_name = os.path.basename(image.name) # Get the name of the image
+				raise serializers.ValidationError(f"[{image_name}] is not a JPG, JPEG or PNG file.")
 		return value
 
 	def create(self, validated_data):
@@ -365,7 +352,7 @@ class CreateProductSerialzier(serializers.ModelSerializer):
 		# Create the product instance				
 		product = Product.objects.create(**validated_data)
 
-		# Add the categories to the product
+		# Add the categories to the product, after converting them to lowercase
 		for item in category:
 			category_item = Category.objects.get(name=item.lower())
 			product.category.add(category_item)
@@ -379,7 +366,7 @@ class CreateProductSerialzier(serializers.ModelSerializer):
 		return product
 	
 	def update(self, instance, validated_data):
-		# Remove category and images from the validated_data if they exist
+		# Get category and images from the validated_data if they exist
 		categories = validated_data.pop("category", None)
 		images = validated_data.pop("images", None)
 
@@ -392,7 +379,7 @@ class CreateProductSerialzier(serializers.ModelSerializer):
 			# Remove their previous relations
 			instance.category.clear()
 	
-			# Creat new relation with new categoires
+			# Creat new relation with new categoires, after converting them to lowercase
 			for category in categories:
 				category_item = Category.objects.get(name=category.lower())
 				instance.category.add(category_item)
