@@ -309,6 +309,9 @@ class CreateProductSerialzier(serializers.ModelSerializer):
 	def validate_original_price(self, value):
 		if value <= 0:
 			raise serializers.ValidationError("Must be a number greater than 0.")
+		
+		if value > 1000000:
+			raise serializers.ValidationError("Only products with prices not greater than 1,000,000 ETB can be posted on this store.")
 		return value
 	
 	# Check if the discount percent is between 0 and 100
