@@ -31,7 +31,7 @@ def list_product_view(request):
 
 	# Check if the query parameters are entered by the user and filter the queryset accordngly
 	if search:
-		products = products.filter(Q(name__icontains=search) | Q(category__name__icontains=search))
+		products = products.filter(Q(name__icontains=search) | Q(category__name__icontains=search)).distinct()
 
 	if category:
 		products = products.filter(category__name__icontains=category)
@@ -75,7 +75,7 @@ def list_product_view(request):
 	if max_price:
 		# Try to convert it into float
 		try:
-			min_price = float(min_price)
+			max_price = float(max_price)
 		except ValueError:
 			# If can't be converted return an error
 			return Response({"max_price": "The max_price query must be a float or an integer value."}, status=status.HTTP_400_BAD_REQUEST)
@@ -238,7 +238,7 @@ def list_product_reviews(request, id):
 	if not reviews.exists():
 		return Response({
 			"no_reviews": "There are no reviews for this product",
-		}, status=status.HTTP_204_NO_CONTENT)
+		}, status=status.HTTP_404_NOT_FOUND)
 	
 	# Prepare Paginator and paginate the queryset
 	paginator = BasicPagination()
