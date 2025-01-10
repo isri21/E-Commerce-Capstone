@@ -145,4 +145,4 @@ AUTH_USER_MODEL = "authenticate.User"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-SECURE_SSL_REDIRECT = True
+# SECURE_SSL_REDIRECT = True
