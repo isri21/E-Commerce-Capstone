@@ -1855,6 +1855,7 @@ https://isri21.pythonanywhere.com/account/ratings/1/
 		"Only 1 decimal place is allowed."
 	]
 }
+```
 
 ## Delete Rating
 **URL**: `/account/ratings/{id}`
