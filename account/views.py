@@ -152,7 +152,7 @@ def list_wishlist_items(request):
 	if not wishlist.exists():
 		return Response({
 			"no_products": "You have no products in you wishlist."
-		}, status=status.HTTP_204_NO_CONTENT)
+		}, status=status.HTTP_404_NOT_FOUND)
 	
 	# Serialize queryset and return 
 	serializer = WishListSerializer(wishlist, many=True)
