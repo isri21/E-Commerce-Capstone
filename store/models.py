@@ -143,9 +143,7 @@ class Purchase(models.Model):
 
 	@property
 	def total_price(self):
-		if self.discount == 0:
-			return (float(self.price) * float(self.quantity))
-		return ((1 - float(self.discount/100)) * float(self.quantity) * float(self.price))
+		return (float(self.price) * float(self.quantity))
 
 	def __str__(self):
 		return f"{self.user.username} | {self.product.name[:20]}"
