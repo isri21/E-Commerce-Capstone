@@ -61,7 +61,7 @@ def list_create_categories(request):
 		if not categories.exists():
 			return Response({
 				"no_categories": "You have not created any products yet."
-			}, status=status.HTTP_204_NO_CONTENT)
+			}, status=status.HTTP_404_NOT_FOUND)
 
 		# Serialize the paginated queryset
 		paginted = paginator.paginate_queryset(categories, request)
