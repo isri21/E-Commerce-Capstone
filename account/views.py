@@ -393,6 +393,11 @@ def manage_products(request, id):
 			return Response({
 				"field": "No update fields were specified."
 			}, status=status.HTTP_400_BAD_REQUEST)
+		
+		# Check if invalid field name entered, second layer of protection since an invalid field name can be entered to bypass the above check
+		for key in request.data:
+			if key not in ["name", "description", "original_price", "discount_percent", "stock_quantity", "category", "images"]:
+				return Response({f"{key}": "Invalid field name!"}, status=status.HTTP_400_BAD_REQUEST)
 
 		# Serialize incoming data while bining it to the product and enabling partial update
 		serializer = CreateProductSerialzier(instance=product, data=request.data, partial=True)
