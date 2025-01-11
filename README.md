@@ -51,7 +51,7 @@ Authorization: Token YOUR_ACCESS_TOKEN
 ## User Registration
 - **Endpoint**: `https://isri21.pythonanywhere.com/auth/register/` 
 - **Method**: `POST`
-- **Description**: Register an new user.
+- **Description**: Register a new user.
 ### Body Parameter
 
 | Parameter          | Type  | Required | Description                                     |
@@ -151,7 +151,7 @@ Returns the user's authentication token.
 | ----------- | ------ | -------- | ------------------------------------------------------------------------------------------------ | ------- | ------------------ |
 | `search`    | `str`  | No       | Enables to search the products in the store by product name or category.                         | `All`   | `?search=phone`    |
 | `page`      | `int`  | No       | Specifying the page number for paginating the products in the store.                             | `1`     | `?page=2`          |
-| `per_page`  | `int`  | No       | Control the number of product items per page.                                                    | `5`     | `?page_size=2`     |
+| `per_page`  | `int`  | No       | Control the number of product items per page.                                                    | `5`     | `?per_page=2`     |
 | `category`  | `str`  | No       | Filter the products in the store by their category.                                              | `All`   | `?category=mobile` |
 | `min_price` | `int`  | No       | Filter the products in the store above a given price                                             | `All`   | `?min_price=1000`  |
 | `max_price` | `int`  | No       | Filter the products in the store below a given price                                             | `All`   | `?max_price=1000`  |
@@ -448,7 +448,6 @@ https://isri21.pythonanywhere.com/products/7/reviews/
 | Key             | Value              | Description                   |
 | --------------- | ------------------ | ----------------------------- |
 | `Authorization` | `Token <token>`    | Required for authentication.  |
-| `Content-Type`  | `application/json` | Indicates the request format. |
 ### Path Parameters
 | Parameter | Type  | Required | Description                                 |
 | --------- | ----- | -------- | ------------------------------------------- |
@@ -497,7 +496,7 @@ https://isri21.pythonanywhere.com/products/1/wishlist/
 ### Path Parameters
 | Parameter | Type  | Required | Description                               |
 | --------- | ----- | -------- | ----------------------------------------- |
-| `{id}`    | `int` | Yes      | The `id` of the product to add to review. |
+| `{id}`    | `int` | Yes      | The `id` of the product to review. |
 #### Example path
 ```https
 https://isri21.pythonanywhere.com/products/1/review/
@@ -562,14 +561,13 @@ https://isri21.pythonanywhere.com/products/1/review/
 | Key             | Value              | Description                   |
 | --------------- | ------------------ | ----------------------------- |
 | `Authorization` | `Token <token>`    | Required for authentication.  |
-| `Content-Type`  | `application/json` | Indicates the request format. |
 ### Path Parameters
 | Parameter | Type  | Required | Description                            |
 | --------- | ----- | -------- | -------------------------------------- |
-| `{id}`    | `int` | Yes      | The `id` of the product to add to rate |
+| `{id}`    | `int` | Yes      | The `id` of the product to rate. |
 #### Example path
 ```https
-https://isri21.pythonanywhere.com/products/1/review/
+https://isri21.pythonanywhere.com/products/1/rate/
 ```
 
 ### Body Parameters
@@ -589,6 +587,12 @@ https://isri21.pythonanywhere.com/products/1/review/
 	"status": "You have successfully rated the product."
 }
 ```
+#### `401 Unauthorized`
+```json
+{
+	"authentication_error": "You must be authenticated in order to rate a product. Please send you authentication token in the request header."
+}
+```
 #### `403 Forbidden`
 ```json
 {
@@ -605,12 +609,6 @@ https://isri21.pythonanywhere.com/products/1/review/
 ```json
 {
 	"error": "You have already rated this product."
-}
-```
-#### `401 Unauthorized`
-```json
-{
-	"authentication_error": "You must be authenticated in order to rate a product. Please send you authentication token in the request header."
 }
 ```
 #### `400 Bad Request`
@@ -670,8 +668,8 @@ https://isri21.pythonanywhere.com/products/1/review/
 
 | Parameter  | Type  | Required | Description                                                          | Default | Example        |
 | ---------- | ----- | -------- | -------------------------------------------------------------------- | ------- | -------------- |
-| `page`     | `int` | No       | Specifying the page number for paginating the products in the store. | `1`     | `?page=2`      |
-| `per_page` | `int` | No       | Control the number of product items per page.                        | `5`     | `?page_size=2` |
+| `page`     | `int` | No       | Specifying the page number to get. | `1`     | `?page=2`      |
+| `per_page` | `int` | No       | Control the number of product items per page.                        | `3`     | `?per_page=2` |
 #### Example Query
 ```url
 https://isri21.pythonanywhere.com/categories/?page=2&per_page=3
@@ -749,7 +747,7 @@ https://isri21.pythonanywhere.com/categories/?page=2&per_page=3
 ## Update Profile Details
 - **URL**: `https://isri21.pythonanywhere.com/account/profile/`  
 - **Method**: `PATCH`  
-- **Description**: Update the 
+- **Description**: Update user profile.
 ### Headers
 | Key             | Value           | Description                  |
 | --------------- | --------------- | ---------------------------- |
@@ -788,12 +786,6 @@ https://isri21.pythonanywhere.com/categories/?page=2&per_page=3
 }
 ```
 
-#### `404 Not Found`
-```json
-{
-	"error": "User with the username [abebe] does not exist."
-}
-```
 #### `400 Bad Request`
 - If not body parameters were passed
 ```json
@@ -823,7 +815,7 @@ https://isri21.pythonanywhere.com/categories/?page=2&per_page=3
 | Parameter  | Type  | Required | Description                                                          | Default | Example       |
 | ---------- | ----- | -------- | -------------------------------------------------------------------- | ------- | ------------- |
 | `page`     | `int` | No       | Specifying the page number for paginating the products in the store. | `1`     | `?page=2`     |
-| `per_page` | `int` | No       | Control the number of product items per page.                        | `5`     | `?per_page=2` |
+| `per_page` | `int` | No       | Control the number of product items per page.                        | `3`     | `?per_page=2` |
 #### Example Query
 ```url
 https://isri21.pythonanywhere.com/account/products/?page=2&per_page=3
@@ -876,7 +868,7 @@ Returns all the products in the store, or returns the products as specified in t
 	]
 }
 ```
-#### `204 No Content`
+#### `404 Not Found`
 - If the user has not posted any products
 ```json
 {
@@ -907,7 +899,7 @@ Returns all the products in the store, or returns the products as specified in t
 | `original_price`   | `str`   | Yes      | The price of the product.                                                                                                                           | Positive number                                                                            |
 | `discount_percent` | `int`   | Yes      | The percentage of discount on the product. If there is not discount specify `0`                                                                     | Between `1` & `100`                                                                        |
 | `stock_quantity`   | `int`   | Yes      | Number of items in stock.                                                                                                                           | Non negative number.                                                                       |
-| `category`         | `str`   | Yes      | Category of the product. When uploading multiple categories, make sure to use the same field name for all.                                          | At least one image is required. Can only use categories that have been previously created. |
+| `category`         | `str`   | Yes      | Category of the product. When uploading multiple categories, make sure to use the same field name for all.                                          | At least one category is required. Can only use categories that have been previously created. |
 | `images`           | `image` | Yes      | Image files for the product. We can add multiple images to a product. When uploading multiple images, make sure to use the same field name for all. | At least one image is required.                                                            |
 #### Example Request Body
 The request is sent as a multiform data. We can use tools like `cURL` or `Postman` to send the request.
@@ -1059,26 +1051,26 @@ The product was posted successfully. Returns the details of the product.
 ### Path Parameters
 | Parameter | Type  | Required | Description            |
 | --------- | ----- | -------- | ---------------------- |
-| `id`      | `int` | Yes      | The product to update. |
+| `id`      | `int` | Yes      | The id of the product to update. |
 ### Body Parameters
-- At least one of the body parameters must be specified.
+- Atleast one body parameter/field must be specified.
 
-| Field              | Type    | Required | Description                                                                                                                                         | Constraints                                                                                                              |
-| ------------------ | ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `name`             | `str`   | No       | The name of the product.                                                                                                                            |                                                                                                                          |
-| `description`      | `str`   | No       | A detailed description of the product.                                                                                                              |                                                                                                                          |
-| `original_price`   | `str`   | No       | The price of the product.                                                                                                                           | Positive number                                                                                                          |
-| `discount_percent` | `int`   | No       | The percentage of discount on the product. If there is not discount specify `0`                                                                     | Between `1` & `100`                                                                                                      |
-| `stock_quantity`   | `int`   | No       | Number of items in stock.                                                                                                                           | Non negative number.                                                                                                     |
-| `categories`       | `str`   | No       | Comma-separated list of category IDs the product belongs to.                                                                                        | The entered as csv's must be ones that have already been created. To get list of created categories go to ***a;lskjdf*** |
-| `image`            | `image` | No       | Image files for the product. We can add multiple images to a product. When uploading multiple images, make sure to use the same field name for all. | At least one image is required.                                                                                          |
+| Field              | Type    | Required | Description                                                                                                                                         | Constraints                                                                                |
+| ------------------ | ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `name`             | `str`   | No      | The name of the product.                                                                                                                            |                                                                                            |
+| `description`      | `str`   | No      | A detailed description of the product.                                                                                                              |                                                                                            |
+| `original_price`   | `str`   | No      | The price of the product.                                                                                                                           | Positive number                                                                            |
+| `discount_percent` | `int`   | No      | The percentage of discount on the product. If there is not discount specify `0`                                                                     | Between `1` & `100`                                                                        |
+| `stock_quantity`   | `int`   | No      | Number of items in stock.                                                                                                                           | Non negative number.                                                                       |
+| `category`         | `str`   | No      | Category of the product. When uploading multiple categories, make sure to use the same field name for all.                                          | At least one category is required. Can only use categories that have been previously created. |
+| `images`           | `image` | No      | Image files for the product. We can add multiple images to a product. When uploading multiple images, make sure to use the same field name for all. | At least one image is required.                                                            |
 #### Example Request Body
 The request is sent as a multiform data. We can use tools like `cURL` or `Postman` to send the request.
 #### Example using cURL
 ```bash
 curl -X PATCH https://isri21.pythonanywhere.com/products/ \
   -H "Authorization: Token asfd998a09asdf098asflakjn" \
-  -F "name=Updated Speacker" \
+  -F "name=Updated Speaker" \
 ```
 
 ### Responses
@@ -1172,10 +1164,16 @@ curl -X PATCH https://isri21.pythonanywhere.com/products/ \
 	"detail": "Authentication credentials were not provided."
 }
 ```
+- When trying to update a product which you didn't create.
+```json
+{
+	"authorizatoin_error": "Only the owner of the product can manage it."
+}
+```
 ## Delete Product
 **URL**: `https://isri21.pythonanywhere.com/account/products/{id}/`
 **Method**: `DELETE`
-**Description**: Delete your product posted.
+**Description**: Delete a product posted.
 ### Headers
 | Key             | Value                 | Description                   |
 | --------------- | --------------------- | ----------------------------- |
@@ -1205,10 +1203,10 @@ https://isri21.pythonanywhere.com/account/products/1/
 	"detail": "Authentication credentials were not provided."
 }
 ```
-- When trying to delete a review which you didn't create.
+- When trying to delete a product which you didn't create.
 ```json
 {
-	"authorizatoin_error": "Only the owner of the review can manage it."
+	"authorizatoin_error": "Only the owner of the product can manage it."
 }
 ```
 ## Get Categories by User
@@ -1219,6 +1217,16 @@ https://isri21.pythonanywhere.com/account/products/1/
 | Key             | Value           | Description                  |
 | --------------- | --------------- | ---------------------------- |
 | `Authorization` | `Token <token>` | Required for authentication. |
+### Query Parameters
+
+| Parameter  | Type  | Required | Description                                                          | Default | Example       |
+| ---------- | ----- | -------- | -------------------------------------------------------------------- | ------- | ------------- |
+| `page`     | `int` | No       | Specifying the page number for paginating the products in the store. | `1`     | `?page=2`     |
+| `per_page` | `int` | No       | Control the number of product items per page.                        | `3`     | `?per_page=2` |
+#### Example Query
+```url
+https://isri21.pythonanywhere.com/account/categories/?page=2&per_page=3
+```
 ### Responses
 #### `200 OK`
 ```json
@@ -1241,16 +1249,11 @@ https://isri21.pythonanywhere.com/account/products/1/
 			"id": 8,
 			"creator": "abebe",
 			"name": "Vehicle"
-		},
-		{
-			"id": 9,
-			"creator": "abebe",
-			"name": "Car"
 		}
 	]
 }
 ```
-#### `204 No Content`
+#### `404 Not Found`
 ```json
 {
 	"no_categories": "You have not created any products yet."
@@ -1300,6 +1303,14 @@ https://isri21.pythonanywhere.com/account/products/1/
     "detail": "Authentication credentials were not provided."
 }
 ```
+#### `400 Bad Request`
+```json
+{
+    "name": [
+        "This field is required."
+    ]
+}
+```
 #### `409 Conflict`
 ```json
 {
@@ -1310,7 +1321,7 @@ https://isri21.pythonanywhere.com/account/products/1/
 ## Update Category
 **URL**: `https://isri21.pythonanywhere.com/account/category/{id}/`
 **Method**: `PUT`
-**Description**: Owner of a category can update the category. Category can only updated if there are no associated products, this is due to security reasons.
+**Description**: Owner of a category can update the category. Category can only be updated if there are no associated products, this is due to security reasons.
 ### Headers
 | Key             | Value                 | Description                   |
 | --------------- | --------------------- | ----------------------------- |
@@ -1383,7 +1394,7 @@ https://isri21.pythonanywhere.com/account/category/12/
 ## Delete Category
 **URL**: `/account/categories/{id}/`
 **Method**: `DELETE`
-**Description**: Owner of a category can delete the category. Category can only updated if there are no associated products, this is due to security reasons.
+**Description**: Owner of a category can delete the category. Category can only be deleted if there are no associated products, this is due to security reasons.
 ### Headers
 | Key             | Value                 | Description                   |
 | --------------- | --------------------- | ----------------------------- |
@@ -1449,7 +1460,7 @@ https://isri21.pythonanywhere.com/profile/category/1/
     }
 ]
 ```
-#### `204 No Content`
+#### `404 Not Found`
 ```json
 {
 	"no_products": "You have no products in you wishlist."
@@ -1472,7 +1483,7 @@ https://isri21.pythonanywhere.com/profile/category/1/
 ### Path Parameters
 | Parameter  | Type  | Required | Description                       |
 | ---------- | ----- | -------- | --------------------------------- |
-| `id`       | `int` | Yes      | The id of the category to update. |
+| `id`       | `int` | Yes      | The id of the product to remove. |
 #### Example Path Parameter
 ```https
 https://isri21.pythonanywhere.com/profile/wishlist/1/
@@ -1496,7 +1507,7 @@ https://isri21.pythonanywhere.com/profile/wishlist/1/
 ## Get Purchased Items
 - **URL**: `https://isri21.pythonanywhere.com/account/purchases/`  
 - **Method**: `GET`  
-- **Description**: View all the items of the users purchased.
+- **Description**: View all the items that the users purchased.
 ### Headers
 | Key             | Value           | Description                  |
 | --------------- | --------------- | ---------------------------- |
@@ -1505,7 +1516,7 @@ https://isri21.pythonanywhere.com/profile/wishlist/1/
 | Parameter  | Type  | Required | Description                                                          | Default | Example        |
 | ---------- | ----- | -------- | -------------------------------------------------------------------- | ------- | -------------- |
 | `page`     | `int` | No       | Specifying the page number for paginating the products in the store. | `1`     | `?page=2`      |
-| `per_page` | `int` | No       | Control the number of product items per page.                        | `5`     | `?page_size=2` |
+| `per_page` | `int` | No       | Control the number of product items per page.                        | `3`     | `?per_page=2` |
 ### Responses
 #### `200 OK`
 ```json
@@ -1541,7 +1552,7 @@ https://isri21.pythonanywhere.com/profile/wishlist/1/
 	]
 }
 ```
-#### `204 No Content`
+#### `404 Not Found`
 ```json
 {
 	"no_items": "You have no purchased products."
@@ -1649,7 +1660,14 @@ https://isri21.pythonanywhere.com/account/reviews/1/
 	"error": "Review does not exist."
 }
 ```
-
+#### `400 Bad Request`
+```json
+{
+    "review": [
+        "This field is required."
+    ]
+}
+```
 #### `401 Unauthorized`
 - If token was not sent in the header.
 ```json
@@ -1735,7 +1753,7 @@ https://isri21.pythonanywhere.com/account/reviews/1/
 	]
 }
 ```
-#### `204 No Content`
+#### `404 Not Found`
 ```json
 {
 	"no_ratings": "You have not rated any products yet."
@@ -1858,7 +1876,7 @@ https://isri21.pythonanywhere.com/account/ratings/1/
 ```
 
 ## Delete Rating
-**URL**: `/account/ratings/{id}`
+**URL**: `https://isri21.pythonanywhere.com/account/ratings/{id}/`
 **Method**: `DELETE`
 **Description**: Delete your rating of a product.
 ### Headers
@@ -1871,7 +1889,7 @@ https://isri21.pythonanywhere.com/account/ratings/1/
 | `id`      | `int` | Yes      | The id of the rating to delete. |
 #### Example Path Parameter
 ```https
-https://isri21.pythonanywhere.com/account/ratings/1
+https://isri21.pythonanywhere.com/account/ratings/1/
 ```
 ### Responses
 #### `204 No Content`
