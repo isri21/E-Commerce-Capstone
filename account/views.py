@@ -192,7 +192,7 @@ def list_purchases(request):
 	if not purchases.exists():
 		return Response({
 			"no_items": "You have no purchased products."
-		}, status=status.HTTP_204_NO_CONTENT)
+		}, status=status.HTTP_404_NOT_FOUND)
 
 	# Paginate data
 	paginated = paginator.paginate_queryset(purchases, request)
@@ -215,7 +215,7 @@ def list_reviews(request):
 	if not reviews.exists():
 		return Response({
 			"no_reviews": "You have not reviewd any products yet."
-		}, status=status.HTTP_204_NO_CONTENT)
+		}, status=status.HTTP_404_NOT_FOUND)
 	
 	# Paginate the query
 	paginator = BasicPagination()
@@ -275,7 +275,7 @@ def list_ratings(request):
 	if not ratings.exists():
 		return Response({
 			"no_ratings": "You have not rated any products yet."
-		}, status=status.HTTP_204_NO_CONTENT)
+		}, status=status.HTTP_404_NOT_FOUND)
 	
 	# Paginate the query
 	paginator = BasicPagination()
