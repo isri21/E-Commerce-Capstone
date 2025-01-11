@@ -336,7 +336,7 @@ def list_create_products(request):
 		if not products.exists():
 			return Response({
 				"no_products": "You have not created any products yet."
-			}, status=status.HTTP_204_NO_CONTENT)
+			}, status=status.HTTP_404_NOT_FOUND)
 		
 		# Paginate the queryset
 		paginator = BasicPagination()
