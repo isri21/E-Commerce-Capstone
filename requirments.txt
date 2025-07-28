@@ -1,7 +1,14 @@
-asgiref==3.8.1
-backports.zoneinfo==0.2.1
-Django==4.2.17
-djangorestframework==3.15.2
-pillow==10.4.0
-sqlparse==0.5.3
-typing-extensions==4.12.2
+Package             Version
+------------------- -------
+asgiref             3.8.1  
+backports.zoneinfo  0.2.1  
+Django              4.2.17 
+django-cors-headers 4.4.0  
+djangorestframework 3.15.2 
+pillow              10.4.0 
+pip                 20.0.2 
+pkg-resources       0.0.0  
+setuptools          44.0.0 
+sqlparse            0.5.3  
+typing-extensions   4.12.2 
+whitenoise          6.7.0  
