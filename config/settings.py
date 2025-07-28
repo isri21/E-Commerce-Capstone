@@ -26,7 +26,7 @@ SECRET_KEY = str(os.getenv("SECRET_KEY"))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv("DEBUG"))
 
-ALLOWED_HOSTS = ["localhost", "isri21.pythonanywhere.com"]
+ALLOWED_HOSTS = ["localhost", "my-django-api-bi7c.onrender.com"]
 
 
 # Application definition
