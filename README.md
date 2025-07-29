@@ -14,42 +14,42 @@ Authorization: Token YOUR_ACCESS_TOKEN
 # List of All Endpoints
 ### Authentication
 ---
-- `POST` - `https://https://my-django-api-bi7c.onrender.com/auth/register/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/login/`
+- `POST` - `https://isri21.pythonanywhere.com/auth/register/`
+- `GET` - `https://isri21.pythonanywhere.com/login/`
 ### Store
-- `GET` - `https://https://my-django-api-bi7c.onrender.com`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/products/<id>/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/products/<id>/reviews/`
-- `POST` - `https://https://my-django-api-bi7c.onrender.com/products/<id>/`
-- `POST` - `https://https://my-django-api-bi7c.onrender.com/products/<id>/wishlist/`
-- `POST` - `https://https://my-django-api-bi7c.onrender.com/products/<id>/review/`
-- `POST` - `https://https://my-django-api-bi7c.onrender.com/products/<id>/rate/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/categories/`
+- `GET` - `https://isri21.pythonanywhere.com`
+- `GET` - `https://isri21.pythonanywhere.com/products/<id>/`
+- `GET` - `https://isri21.pythonanywhere.com/products/<id>/reviews/`
+- `POST` - `https://isri21.pythonanywhere.com/products/<id>/`
+- `POST` - `https://isri21.pythonanywhere.com/products/<id>/wishlist/`
+- `POST` - `https://isri21.pythonanywhere.com/products/<id>/review/`
+- `POST` - `https://isri21.pythonanywhere.com/products/<id>/rate/`
+- `GET` - `https://isri21.pythonanywhere.com/categories/`
 ### Account
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/account/`
-- `PATCH` - `https://https://my-django-api-bi7c.onrender.com/account/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/account/categories/`
-- `POST` - `https://https://my-django-api-bi7c.onrender.com/account/categories/`
-- `PUT` - `https://https://my-django-api-bi7c.onrender.com/account/categories/<id>/`
-- `DELETE` - `https://https://my-django-api-bi7c.onrender.com/account/categories/<id>/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/account/wishlist/`
-- `DELETE` - `https://https://my-django-api-bi7c.onrender.com/account/wishlist/<id>/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/account/purchases/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/account/reviews/`
-- `PUT` - `https://https://my-django-api-bi7c.onrender.com/account/reviews/<id>/`
-- `DELETE` - `https://https://my-django-api-bi7c.onrender.com/account/reviews/<id>/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/account/ratings/`
-- `PUT` - `https://https://my-django-api-bi7c.onrender.com/account/ratings/<id>/`
-- `DELETE` - `https://https://my-django-api-bi7c.onrender.com/account/ratings/<id>/`
-- `GET` - `https://https://my-django-api-bi7c.onrender.com/account/products/`
-- `POST` - `https://https://my-django-api-bi7c.onrender.com/account/products/`
-- `PATCH` - `https://https://my-django-api-bi7c.onrender.com/account/products/<id>/`
-- `DELETE` - `https://https://my-django-api-bi7c.onrender.com/account/products/<id>/`
+- `GET` - `https://isri21.pythonanywhere.com/account/`
+- `PATCH` - `https://isri21.pythonanywhere.com/account/`
+- `GET` - `https://isri21.pythonanywhere.com/account/categories/`
+- `POST` - `https://isri21.pythonanywhere.com/account/categories/`
+- `PUT` - `https://isri21.pythonanywhere.com/account/categories/<id>/`
+- `DELETE` - `https://isri21.pythonanywhere.com/account/categories/<id>/`
+- `GET` - `https://isri21.pythonanywhere.com/account/wishlist/`
+- `DELETE` - `https://isri21.pythonanywhere.com/account/wishlist/<id>/`
+- `GET` - `https://isri21.pythonanywhere.com/account/purchases/`
+- `GET` - `https://isri21.pythonanywhere.com/account/reviews/`
+- `PUT` - `https://isri21.pythonanywhere.com/account/reviews/<id>/`
+- `DELETE` - `https://isri21.pythonanywhere.com/account/reviews/<id>/`
+- `GET` - `https://isri21.pythonanywhere.com/account/ratings/`
+- `PUT` - `https://isri21.pythonanywhere.com/account/ratings/<id>/`
+- `DELETE` - `https://isri21.pythonanywhere.com/account/ratings/<id>/`
+- `GET` - `https://isri21.pythonanywhere.com/account/products/`
+- `POST` - `https://isri21.pythonanywhere.com/account/products/`
+- `PATCH` - `https://isri21.pythonanywhere.com/account/products/<id>/`
+- `DELETE` - `https://isri21.pythonanywhere.com/account/products/<id>/`
 
 
 # Authentication Endpoints
 ## User Registration
-- **Endpoint**: `https://https://my-django-api-bi7c.onrender.com/auth/register/` 
+- **Endpoint**: `https://isri21.pythonanywhere.com/auth/register/` 
 - **Method**: `POST`
 - **Description**: Register a new user.
 ### Body Parameter
@@ -115,7 +115,7 @@ The user was successfully created.
 }
 ```
 ## User Login
-- **Endpoint**: `https://https://my-django-api-bi7c.onrender.com/login/`
+- **Endpoint**: `https://isri21.pythonanywhere.com/login/`
 - **Method**: `GET`
 - **Description**: Obtain an authorization token.
 ### Request Body
@@ -142,7 +142,7 @@ Returns the user's authentication token.
 ```
 # Store Endpoints
 ## Get All Products
-**URL**: `https://https://my-django-api-bi7c.onrender.com`
+**URL**: `https://isri21.pythonanywhere.com`
 **Method**: `GET`
 **Description**: User can get a list f all the products in the store.
 ### Query Parameters
@@ -158,7 +158,7 @@ Returns the user's authentication token.
 | `in_stock`  | `bool` | No       | Filter the products in the store based on their stock availability. Can only enter `no` or `yes` | `All`   | `?in_stock=yes`    |
 #### Example Query
 ```url
-https://https://my-django-api-bi7c.onrender.com/?search=phone&category=mobile&in_stock=yes
+https://isri21.pythonanywhere.com/?search=phone&category=mobile&in_stock=yes
 ```
 ### Response
 #### `200 OK`
@@ -169,7 +169,7 @@ Returns all the products in the store, or returns the products as specified in t
 	"total_pages": 100,
 	"current_page": 1,
 	"products_per_page": 2,
-	"next_page": "http://https://my-django-api-bi7c.onrender.com/https://https://my-django-api-bi7c.onrender.com/products/?page=2",
+	"next_page": "http://isri21.pythonanywhere.com/https://isri21.pythonanywhere.com/products/?page=2",
 	"previous_page": null,
 	"results": [
 	{
@@ -246,7 +246,7 @@ Returns all the products in the store, or returns the products as specified in t
 }
 ```
 ## Get Specific Product
-**URL**: `https://https://my-django-api-bi7c.onrender.com/products/<id>/`
+**URL**: `https://isri21.pythonanywhere.com/products/<id>/`
 **Method**: `GET`
 **Description**: User can get the details for a specific product.
 ### Path Parameters
@@ -256,7 +256,7 @@ Returns all the products in the store, or returns the products as specified in t
 | `{id}`    | `int` | Yes      | The `id` of the product. |
 #### Example Path
 ```https
-https://https://my-django-api-bi7c.onrender.com/products/1/
+https://isri21.pythonanywhere.com/products/1/
 ```
 ### Responses
 #### `200 OK`
@@ -298,7 +298,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/
 ```
 
 ## Purchase a Product
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/products/<id>/`
+- **URL**: `https://isri21.pythonanywhere.com/products/<id>/`
 - **Method**: `POST`
 - **Description**: Purchase a product.
 ### Headers
@@ -311,7 +311,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/
 | `{id}`    | `int` | Yes      | The `id` of the product to purchase. |
 #### Example path
 ```https
-https://https://my-django-api-bi7c.onrender.com/products/1/
+https://isri21.pythonanywhere.com/products/1/
 ```
 ### Body Parameter
 
@@ -387,7 +387,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/
 }
 ```
 ## Get Product Review
-**URL**: `https://https://my-django-api-bi7c.onrender.com/products/{id}/reviews/`
+**URL**: `https://isri21.pythonanywhere.com/products/{id}/reviews/`
 **Method**: `GET`
 **Description**: User can get the reviews for a specific product.
 ### Path Parameters
@@ -397,7 +397,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/
 | `{id}`    | `int` | Yes      | The `id` of the product. |
 #### Example Path
 ```https
-https://https://my-django-api-bi7c.onrender.com/products/7/reviews/
+https://isri21.pythonanywhere.com/products/7/reviews/
 ```
 ### Responses
 #### `200 OK`
@@ -441,7 +441,7 @@ https://https://my-django-api-bi7c.onrender.com/products/7/reviews/
 ```
 
 ## Add a Product to Wishlist
-- **URL**: `https://my-django-api-bi7c.onrender.com/products/{id}/wishlist/`
+- **URL**: `isri21.pythonanywhere.com/products/{id}/wishlist/`
 - **Method**: `POST`
 - **Description**: Add a product to a users wish list.
 ### Header
@@ -454,7 +454,7 @@ https://https://my-django-api-bi7c.onrender.com/products/7/reviews/
 | `{id}`    | `int` | Yes      | The `id` of the product to add to wish list |
 #### Example path
 ```https
-https://https://my-django-api-bi7c.onrender.com/products/1/wishlist/
+https://isri21.pythonanywhere.com/products/1/wishlist/
 ```
 ### Responses
 #### `201 Created`
@@ -485,7 +485,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/wishlist/
 ```
 
 ## Review Product
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/products/{id}/review/`
+- **URL**: `https://isri21.pythonanywhere.com/products/{id}/review/`
 - **Method**: `POST`
 - **Description**: Give a product a review
 ### Header
@@ -499,7 +499,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/wishlist/
 | `{id}`    | `int` | Yes      | The `id` of the product to review. |
 #### Example path
 ```https
-https://https://my-django-api-bi7c.onrender.com/products/1/review/
+https://isri21.pythonanywhere.com/products/1/review/
 ```
 
 ### Body Parameters
@@ -554,7 +554,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/review/
 ```
 
 ## Rate a Product
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/products/{id}/rate/`
+- **URL**: `https://isri21.pythonanywhere.com/products/{id}/rate/`
 - **Method**: `POST`
 - **Description**: Give a product a rating
 ### Header
@@ -567,7 +567,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/review/
 | `{id}`    | `int` | Yes      | The `id` of the product to rate. |
 #### Example path
 ```https
-https://https://my-django-api-bi7c.onrender.com/products/1/rate/
+https://isri21.pythonanywhere.com/products/1/rate/
 ```
 
 ### Body Parameters
@@ -661,7 +661,7 @@ https://https://my-django-api-bi7c.onrender.com/products/1/rate/
 }
 ```
 ## Get All Categories
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/categories/`  
+- **URL**: `https://isri21.pythonanywhere.com/categories/`  
 - **Method**: `GET`  
 - **Description**: View all the available categories.
 ### Query Parameters
@@ -672,15 +672,15 @@ https://https://my-django-api-bi7c.onrender.com/products/1/rate/
 | `per_page` | `int` | No       | Control the number of product items per page.                        | `3`     | `?per_page=2` |
 #### Example Query
 ```url
-https://https://my-django-api-bi7c.onrender.com/categories/?page=2&per_page=3
+https://isri21.pythonanywhere.com/categories/?page=2&per_page=3
 ```
 ### Responses
 #### `200 OK`
 ```json
 {
 	"count": 7,
-	"next": "http://https://my-django-api-bi7c.onrender.com/categories/?page=3",
-	"previous": "http://https://my-django-api-bi7c.onrender.com/categories/",
+	"next": "http://isri21.pythonanywhere.com/categories/?page=3",
+	"previous": "http://isri21.pythonanywhere.com/categories/",
 	"results": [
 		{
 			"id": 8,
@@ -706,7 +706,7 @@ https://https://my-django-api-bi7c.onrender.com/categories/?page=2&per_page=3
 
 # Profile Endpoints
 ## Get Profile Details
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/account/profile/`  
+- **URL**: `https://isri21.pythonanywhere.com/account/profile/`  
 - **Method**: `GET`  
 - **Description**: View the details of a users profile.
 ### Headers
@@ -745,7 +745,7 @@ https://https://my-django-api-bi7c.onrender.com/categories/?page=2&per_page=3
 ```
 
 ## Update Profile Details
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/account/profile/`  
+- **URL**: `https://isri21.pythonanywhere.com/account/profile/`  
 - **Method**: `PATCH`  
 - **Description**: Update user profile.
 ### Headers
@@ -803,7 +803,7 @@ https://https://my-django-api-bi7c.onrender.com/categories/?page=2&per_page=3
 ```
 
 ## Get Products Posted
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/account/products/`
+- **URL**: `https://isri21.pythonanywhere.com/account/products/`
 - **Method**: `GET`
 - **Description**: User can get a list of all the products that they have posted.
 ### Headers
@@ -818,7 +818,7 @@ https://https://my-django-api-bi7c.onrender.com/categories/?page=2&per_page=3
 | `per_page` | `int` | No       | Control the number of product items per page.                        | `3`     | `?per_page=2` |
 #### Example Query
 ```url
-https://https://my-django-api-bi7c.onrender.com/account/products/?page=2&per_page=3
+https://isri21.pythonanywhere.com/account/products/?page=2&per_page=3
 ```
 ### Response
 #### `200 OK`
@@ -882,7 +882,7 @@ Returns all the products in the store, or returns the products as specified in t
 }
 ```
 ## Create Product
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/products/`
+**URL**: `https://isri21.pythonanywhere.com/account/products/`
 **Method**: `POST`
 **Description**: Users can post a product on the store.
 ### Headers
@@ -905,7 +905,7 @@ Returns all the products in the store, or returns the products as specified in t
 The request is sent as a multiform data. We can use tools like `cURL` or `Postman` to send the request.
 #### Example using cURL
 ```bash
-curl -X POST https://https://my-django-api-bi7c.onrender.com/products/ \
+curl -X POST https://isri21.pythonanywhere.com/products/ \
   -H "Authorization: Token asfd998a09asdf098asflakjn" \
   -F "name=Speaker" \
   -F "description=Great Mouse!" \
@@ -1040,7 +1040,7 @@ The product was posted successfully. Returns the details of the product.
 }
 ```
 ## Update Product
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/products/{id}/`
+**URL**: `https://isri21.pythonanywhere.com/account/products/{id}/`
 **Method**: `PATCH`
 **Description**: Users can edit a product post on the store.
 ### Headers
@@ -1068,7 +1068,7 @@ The product was posted successfully. Returns the details of the product.
 The request is sent as a multiform data. We can use tools like `cURL` or `Postman` to send the request.
 #### Example using cURL
 ```bash
-curl -X PATCH https://https://my-django-api-bi7c.onrender.com/products/ \
+curl -X PATCH https://isri21.pythonanywhere.com/products/ \
   -H "Authorization: Token asfd998a09asdf098asflakjn" \
   -F "name=Updated Speaker" \
 ```
@@ -1171,7 +1171,7 @@ curl -X PATCH https://https://my-django-api-bi7c.onrender.com/products/ \
 }
 ```
 ## Delete Product
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/products/{id}/`
+**URL**: `https://isri21.pythonanywhere.com/account/products/{id}/`
 **Method**: `DELETE`
 **Description**: Delete a product posted.
 ### Headers
@@ -1184,7 +1184,7 @@ curl -X PATCH https://https://my-django-api-bi7c.onrender.com/products/ \
 | `id`      | `int` | Yes      | The id of the product to delete. |
 #### Example Path Parameter
 ```https
-https://https://my-django-api-bi7c.onrender.com/account/products/1/
+https://isri21.pythonanywhere.com/account/products/1/
 ```
 ### Responses
 #### `204 No Content`
@@ -1210,7 +1210,7 @@ https://https://my-django-api-bi7c.onrender.com/account/products/1/
 }
 ```
 ## Get Categories by User
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/account/categories/`  
+- **URL**: `https://isri21.pythonanywhere.com/account/categories/`  
 - **Method**: `GET`  
 - **Description**: View all categories created by the user.
 ### Headers
@@ -1225,7 +1225,7 @@ https://https://my-django-api-bi7c.onrender.com/account/products/1/
 | `per_page` | `int` | No       | Control the number of product items per page.                        | `3`     | `?per_page=2` |
 #### Example Query
 ```url
-https://https://my-django-api-bi7c.onrender.com/account/categories/?page=2&per_page=3
+https://isri21.pythonanywhere.com/account/categories/?page=2&per_page=3
 ```
 ### Responses
 #### `200 OK`
@@ -1267,7 +1267,7 @@ https://https://my-django-api-bi7c.onrender.com/account/categories/?page=2&per_p
 ```
 
 ## Create Category
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/categories/`
+**URL**: `https://isri21.pythonanywhere.com/account/categories/`
 **Method**: `POST`
 **Description**: Create a new category.
 ### Headers
@@ -1319,7 +1319,7 @@ https://https://my-django-api-bi7c.onrender.com/account/categories/?page=2&per_p
 ```
 
 ## Update Category
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/category/{id}/`
+**URL**: `https://isri21.pythonanywhere.com/account/category/{id}/`
 **Method**: `PUT`
 **Description**: Owner of a category can update the category. Category can only be updated if there are no associated products, this is due to security reasons.
 ### Headers
@@ -1332,7 +1332,7 @@ https://https://my-django-api-bi7c.onrender.com/account/categories/?page=2&per_p
 | `id`       | `int` | Yes      | The id of the category to update. |
 #### Example Path Parameter
 ```https
-https://https://my-django-api-bi7c.onrender.com/account/category/12/
+https://isri21.pythonanywhere.com/account/category/12/
 ```
 ### Body Parameters
 | Parameter | Type  | Required | Description                        |
@@ -1405,7 +1405,7 @@ https://https://my-django-api-bi7c.onrender.com/account/category/12/
 | `id`       | `int` | Yes      | The id of the category to update. |
 #### Example Path Parameter
 ```https
-https://https://my-django-api-bi7c.onrender.com/profile/category/1/
+https://isri21.pythonanywhere.com/profile/category/1/
 ```
 ### Responses
 #### `204 No Content`
@@ -1437,7 +1437,7 @@ https://https://my-django-api-bi7c.onrender.com/profile/category/1/
 }
 ```
 ## Get User Wishlist
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/account/wishlist/`  
+- **URL**: `https://isri21.pythonanywhere.com/account/wishlist/`  
 - **Method**: `GET`  
 - **Description**: View all the items of the users wishlist.
 ### Headers
@@ -1473,7 +1473,7 @@ https://https://my-django-api-bi7c.onrender.com/profile/category/1/
 }
 ```
 ## Delete Product From Wishlist
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/wishlist/{id}/`
+**URL**: `https://isri21.pythonanywhere.com/account/wishlist/{id}/`
 **Method**: `DELETE`
 **Description**: Delete a product from wish list
 ### Headers
@@ -1486,7 +1486,7 @@ https://https://my-django-api-bi7c.onrender.com/profile/category/1/
 | `id`       | `int` | Yes      | The id of the product to remove. |
 #### Example Path Parameter
 ```https
-https://https://my-django-api-bi7c.onrender.com/profile/wishlist/1/
+https://isri21.pythonanywhere.com/profile/wishlist/1/
 ```
 ### Responses
 #### `204 No Content`
@@ -1505,7 +1505,7 @@ https://https://my-django-api-bi7c.onrender.com/profile/wishlist/1/
 }
 ```
 ## Get Purchased Items
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/account/purchases/`  
+- **URL**: `https://isri21.pythonanywhere.com/account/purchases/`  
 - **Method**: `GET`  
 - **Description**: View all the items that the users purchased.
 ### Headers
@@ -1522,7 +1522,7 @@ https://https://my-django-api-bi7c.onrender.com/profile/wishlist/1/
 ```json
 {
 	"count": 5,
-	"next": "http://https://my-django-api-bi7c.onrender.com/account/purchases/?page=2",
+	"next": "http://isri21.pythonanywhere.com/account/purchases/?page=2",
 	"previous": null,
 	"results": [
 		{
@@ -1566,7 +1566,7 @@ https://https://my-django-api-bi7c.onrender.com/profile/wishlist/1/
 ```
 
 ## Get Products Reviewed
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/account/reviews/`  
+- **URL**: `https://isri21.pythonanywhere.com/account/reviews/`  
 - **Method**: `GET`  
 - **Description**: View all products that a user reviewed.
 ### Headers
@@ -1628,7 +1628,7 @@ https://https://my-django-api-bi7c.onrender.com/profile/wishlist/1/
 | `id`      | `int` | Yes      | The id of the review to update. |
 #### Example Path Parameter
 ```https
-https://https://my-django-api-bi7c.onrender.com/account/reviews/1/
+https://isri21.pythonanywhere.com/account/reviews/1/
 ```
 ### Body Parameters
 | Parameter | Type  | Required | Description                        |
@@ -1682,7 +1682,7 @@ https://https://my-django-api-bi7c.onrender.com/account/reviews/1/
 }
 ```
 ## Delete Category
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/reviews/{id}/`
+**URL**: `https://isri21.pythonanywhere.com/account/reviews/{id}/`
 **Method**: `DELETE`
 **Description**: Delete your review of a product.
 ### Headers
@@ -1695,7 +1695,7 @@ https://https://my-django-api-bi7c.onrender.com/account/reviews/1/
 | `id`      | `int` | Yes      | The id of the review to delete. |
 #### Example Path Parameter
 ```https
-https://https://my-django-api-bi7c.onrender.com/account/reviews/1/
+https://isri21.pythonanywhere.com/account/reviews/1/
 ```
 ### Responses
 #### `204 No Content`
@@ -1721,7 +1721,7 @@ https://https://my-django-api-bi7c.onrender.com/account/reviews/1/
 }
 ```
 ## Get Products Rated
-- **URL**: `https://https://my-django-api-bi7c.onrender.com/account/ratings/`  
+- **URL**: `https://isri21.pythonanywhere.com/account/ratings/`  
 - **Method**: `GET`  
 - **Description**: View all products that a user rated.
 ### Headers
@@ -1766,7 +1766,7 @@ https://https://my-django-api-bi7c.onrender.com/account/reviews/1/
 }
 ```
 ## Update Rating
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/ratings/{id}/`
+**URL**: `https://isri21.pythonanywhere.com/account/ratings/{id}/`
 **Method**: `PUT`
 **Description**: Update review of a product.
 ### Headers
@@ -1779,7 +1779,7 @@ https://https://my-django-api-bi7c.onrender.com/account/reviews/1/
 | `id`      | `int` | Yes      | The id of the rating to update. |
 #### Example Path Parameter
 ```https
-https://https://my-django-api-bi7c.onrender.com/account/ratings/1/
+https://isri21.pythonanywhere.com/account/ratings/1/
 ```
 ### Body Parameters
 | Parameter | Type  | Required | Description                        |
@@ -1876,7 +1876,7 @@ https://https://my-django-api-bi7c.onrender.com/account/ratings/1/
 ```
 
 ## Delete Rating
-**URL**: `https://https://my-django-api-bi7c.onrender.com/account/ratings/{id}/`
+**URL**: `https://isri21.pythonanywhere.com/account/ratings/{id}/`
 **Method**: `DELETE`
 **Description**: Delete your rating of a product.
 ### Headers
@@ -1889,7 +1889,7 @@ https://https://my-django-api-bi7c.onrender.com/account/ratings/1/
 | `id`      | `int` | Yes      | The id of the rating to delete. |
 #### Example Path Parameter
 ```https
-https://https://my-django-api-bi7c.onrender.com/account/ratings/1/
+https://isri21.pythonanywhere.com/account/ratings/1/
 ```
 ### Responses
 #### `204 No Content`
